@@ -24,6 +24,9 @@ VOICE_ID = "njynYTWWtWecayrQg0HZ"
 MODEL = "eleven_v4"
 TALK_MODEL = "bytedance/omnihuman/v2"
 STILL = ROOT / "raw" / "jasmin-office.png"
+# fal's talking-head model only downloads by URL, and fal's upload host is not
+# reachable from the build container, so inputs are read from the public repo.
+RAW_BASE = "https://raw.githubusercontent.com/Project888-maker/gasanbuild"
 TALK_PROMPT = (
     "A professional woman on a video call at her desk, talking warmly and confidently to the camera "
     "with clear, natural lip movements that match her words, small natural head movements and "
@@ -74,12 +77,10 @@ def talk(line: dict) -> Path:
     if dest.exists():
         return dest
     dest.parent.mkdir(parents=True, exist_ok=True)
-    still = ROOT / "raw" / "jasmin-office.talk.jpg"
-    if not still.exists():
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(STILL), "-vf", "scale=1280:-2", "-q:v", "3", str(still)], check=True)
+    ref = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
     result = fal_client.subscribe(TALK_MODEL, arguments={
-        "image_url": data_uri(still, "image/jpeg"),
-        "audio_url": data_uri(audio, "audio/mpeg"),
+        "image_url": f"{RAW_BASE}/{ref}/web/public/media/jasmin-office.jpg",
+        "audio_url": f"{RAW_BASE}/{ref}/web/public/media/voice/{line['id']}.mp3",
         "prompt": TALK_PROMPT,
     }, client_timeout=1200)
     url = result["video"]["url"]

@@ -1,1 +1,0 @@
-✗ [{'loc': ['body', 'audio_url'], 'msg': 'Failed to download the file. Please check if the URL is accessible and try again.', 'type': 'file_download_error', 'url': 'https://docs.fal.ai/errors#file_download_error', 'input': 'data:audio/mpeg;base64,SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYzLjEuMTAyAAAAAAAAAAA

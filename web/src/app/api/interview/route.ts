@@ -2,6 +2,7 @@
 // Approval (and the private call link) comes in the next phase, through Hermes.
 
 import { sql, today, visitorId } from "@/lib/db";
+import { decisionUrl, telegram, type Decision } from "@/lib/decisions";
 
 export const runtime = "nodejs";
 
@@ -15,9 +16,6 @@ function text(value: unknown, max: number) {
 }
 
 async function notify(r: Request_, id: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chat = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chat) return;
   const lines = [
     "🗓 New interview request for Jasmin",
     `${r.name}${r.role ? `, ${r.role}` : ""}${r.company ? ` at ${r.company}` : ""}`,
@@ -25,15 +23,15 @@ async function notify(r: Request_, id: string) {
     r.preferred ? `When: ${r.preferred}` : "",
     "",
     r.topics,
-    "",
-    `Request ${id.slice(0, 8)}`,
   ].filter((line, i, all) => line !== "" || all[i - 1] !== "");
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chat, text: lines.join("\n"), disable_web_page_preview: true }),
-    signal: AbortSignal.timeout(8000),
-  }).catch((e) => console.error("telegram notify", e));
+  const link = (action: Decision["action"], minutes: number) => decisionUrl({ id, action, minutes });
+  const a20 = link("approve", 20);
+  const a45 = link("approve", 45);
+  const no = link("decline", 0);
+  const buttons = a20 && a45 && no
+    ? [[{ text: "✅ Approve 20 min", url: a20 }, { text: "✅ Approve 45 min", url: a45 }], [{ text: "✖ Decline", url: no }]]
+    : undefined;
+  await telegram(lines.join("\n"), buttons);
 }
 
 export async function POST(request: Request) {
