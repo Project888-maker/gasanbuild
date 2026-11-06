@@ -45,11 +45,11 @@ export default async function Room({ params }: { params: Promise<{ token: string
           </p>
           <div className="mt-6 rounded-2xl border border-gold/30 bg-ink-2 p-5">
             <p className="flex items-center gap-2 font-mono text-[0.7rem] tracking-[0.2em] text-gold">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold" /> LIVE VIDEO · OPENING SOON
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold" /> WHAT HAPPENS NEXT
             </p>
             <p className="mt-2 text-sm leading-relaxed text-white/75">
-              Gasan will email you to confirm the time. At your call, this same link starts the live video with me: I&apos;ll
-              answer your questions and bring each project up on screen as I explain it.
+              The live video call isn&apos;t open yet. Gasan will email you personally to confirm a time and how you&apos;ll
+              join. Until then, ask me anything here in chat or take my guided tour.
             </p>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">

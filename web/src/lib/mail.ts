@@ -86,13 +86,13 @@ export async function sendApproved(to: string, name: string, minutes: number, ro
   const lines = [
     `Hi ${esc(first)},`,
     `Good news: Gasan has approved your <strong>${minutes}-minute</strong> live video interview with me.`,
-    `Your private room is below. It's yours alone and works until ${until}. Gasan will reply to confirm the exact time${preferred ? ` (you suggested: ${esc(preferred)})` : ""}.`,
-    "Until the call, your room is where you can chat with me and take my guided tour of the projects.",
+    `Gasan will reply to you personally to confirm a time${preferred ? ` (you suggested: ${esc(preferred)})` : ""} and how you'll join.`,
+    `Meanwhile, your private room below is yours alone until ${until}: chat with me there or take my guided tour of the projects.`,
   ];
   return send(
     to,
     `Approved: your ${minutes}-minute interview with Jasmin`,
     layout(lines, { label: "Open your private room", url: room }),
-    `Hi ${first},\n\nGasan has approved your ${minutes}-minute live video interview with me.\n\nYour private room (works until ${until}): ${room}\n\nGasan will reply to confirm the exact time${preferred ? ` (you suggested: ${preferred})` : ""}.\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
+    `Hi ${first},\n\nGasan has approved your ${minutes}-minute live video interview with me. He'll reply to you personally to confirm a time${preferred ? ` (you suggested: ${preferred})` : ""} and how you'll join.\n\nMeanwhile, your private room (until ${until}): ${room}\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
   );
 }
