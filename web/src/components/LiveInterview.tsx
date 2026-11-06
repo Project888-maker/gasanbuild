@@ -137,9 +137,15 @@ export default function LiveInterview() {
 
   const first = (request.current?.name || "").split(" ")[0];
 
+  // What this browser saw, into the server's logs (journalctl -u hermes-presenter / hermes).
   const log = (text: string) => {
+    const line = String(text).slice(0, 300);
     try {
-      if (ws.current?.readyState === 1) ws.current.send(JSON.stringify({ type: "log", text: String(text).slice(0, 300) }));
+      if (mode.current === "room" && lk.current) {
+        void lk.current.localParticipant
+          .publishData(new TextEncoder().encode(line), { reliable: true, topic: "log" })
+          .catch(() => {});
+      } else if (ws.current?.readyState === 1) ws.current.send(JSON.stringify({ type: "log", text: line }));
     } catch {}
   };
 
@@ -420,7 +426,16 @@ export default function LiveInterview() {
       } else if (track === herAudio.current) herAudio.current = null;
     });
     room.on(LK.RoomEvent.AudioPlaybackStatusChanged, () => {
-      if (!room.canPlaybackAudio) setNeedTap(true);
+      if (!room.canPlaybackAudio) {
+        setNeedTap(true);
+        log("the browser blocked her voice; asking for a tap");
+      }
+    });
+    room.on(LK.RoomEvent.TrackMuted, (publication, participant) => {
+      if (participant.identity !== room.localParticipant.identity) log(`${participant.identity} muted their ${publication.kind}`);
+    });
+    room.on(LK.RoomEvent.TrackUnmuted, (publication, participant) => {
+      if (participant.identity !== room.localParticipant.identity) log(`${participant.identity} unmuted their ${publication.kind}`);
     });
     room.on(LK.RoomEvent.DataReceived, (payload, _participant, _kind, topic) => {
       if (topic !== "jasmin" || lk.current !== room) return;
@@ -637,6 +652,26 @@ export default function LiveInterview() {
     return () => cancelAnimationFrame(frame);
   }, [phase]);
 
+  // If the browser pauses her video or voice (it happened mid-sentence; toggling the
+  // window fixed it, because that plays them again), play them again by itself.
+  useEffect(() => {
+    if (phase !== "live") return;
+    const timer = setInterval(() => {
+      for (const [el, track, what] of [
+        [videoRef.current, herVideo.current, "video"],
+        [audioRef.current, herAudio.current, "voice"],
+      ] as const) {
+        if (el && track && el.paused) {
+          log(`her ${what} was paused by the browser; playing it again`);
+          el.play().catch(() => setNeedTap(true));
+        }
+      }
+    }, 1500);
+    return () => clearInterval(timer);
+    // log/setNeedTap only touch refs and stable setters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
   // Leaving the site (not just changing page) ends a call that is on.
   useEffect(() => () => {
     if (ws.current || mic.current) finish("page closed");
@@ -721,7 +756,10 @@ export default function LiveInterview() {
       {voice}
       <aside aria-label="Live interview with Jasmin" className="glass fixed bottom-3 right-3 z-[80] w-[176px] overflow-hidden rounded-2xl shadow-2xl shadow-black/70 sm:w-[230px]">
         {picture}
-        {said && <p className="line-clamp-2 px-3 pt-2 text-[0.72rem] leading-snug text-white/85 sm:line-clamp-3">{said}</p>}
+        {/* A fixed height, newest words at the bottom: the window doesn't jump as she talks. */}
+        <div className="flex h-[2.6rem] flex-col justify-end overflow-hidden px-3 pt-2 sm:h-[3.6rem]">
+          <p className="text-[0.72rem] leading-snug text-white/85">{said}</p>
+        </div>
         {controls}
       </aside>
       </>
@@ -735,9 +773,9 @@ export default function LiveInterview() {
       <p className="eyebrow mb-4">Live interview · Jasmin, AI Chief of Staff</p>
       {picture}
       {phase === "live" && (
-        <div aria-live="polite" className="mt-4 min-h-[4.5rem] w-full max-w-xl text-center">
+        <div aria-live="polite" className="mt-4 flex h-[6.5rem] w-full max-w-xl flex-col justify-end overflow-hidden text-center">
           <p className="text-[0.98rem] leading-relaxed text-white/90">{said}</p>
-          {heard && <p className="mt-2 text-xs text-muted">You: {heard}</p>}
+          <p className="mt-2 h-4 truncate text-xs text-muted">{heard ? `You: ${heard}` : ""}</p>
         </div>
       )}
       {controls}
@@ -761,7 +799,9 @@ export default function LiveInterview() {
           Cancel
         </button>
       )}
-      {phase !== "ended" && first && <p className="mt-4 text-xs text-muted">Headphones help Jasmin hear you clearly.</p>}
+      {phase !== "ended" && first && (
+        <p className="mt-4 text-xs text-muted">Use headphones if you can: on speakers, Jasmin can hear her own voice.</p>
+      )}
     </div>
     </>
   );
