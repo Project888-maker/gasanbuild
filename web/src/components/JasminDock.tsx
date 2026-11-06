@@ -41,7 +41,11 @@ export default function JasminDock() {
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [clipFailed, setClipFailed] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const clipRef = useRef<HTMLVideoElement>(null);
+  const voiceRef = useRef<HTMLAudioElement>(null);
 
   const send = useCallback(
     async (text: string) => {
@@ -119,14 +123,26 @@ export default function JasminDock() {
     };
   }, [mode, step, router]);
 
+  // She speaks each step (her lip-synced clip, or her voice over the idle loop);
+  // the step advances when she finishes. A timer is only the safety net.
+  const advance = useCallback(
+    (from: number) => setStep((s) => (s === from && s < tour.length - 1 ? s + 1 : s)),
+    [],
+  );
+  useEffect(() => setClipFailed(false), [step]);
   useEffect(() => {
     if (mode !== "tour" || paused) return;
-    const ms = Math.max(5500, tour[step].say.length * 62);
-    const timer = setTimeout(() => {
-      if (step < tour.length - 1) setStep(step + 1);
-    }, ms);
+    const ms = Math.max(6000, tour[step].say.length * 62) + 5000;
+    const timer = setTimeout(() => advance(step), ms);
     return () => clearTimeout(timer);
-  }, [mode, step, paused]);
+  }, [mode, step, paused, advance]);
+  useEffect(() => {
+    for (const media of [clipRef.current, voiceRef.current]) {
+      if (!media) continue;
+      if (paused) media.pause();
+      else void media.play().catch(() => {});
+    }
+  }, [paused, step, clipFailed]);
 
   const endTour = () => {
     clearHighlight();
@@ -140,11 +156,37 @@ export default function JasminDock() {
         aria-live="polite"
         className="glass fixed bottom-4 left-4 right-4 z-[70] overflow-hidden rounded-2xl shadow-2xl shadow-black/60 sm:left-auto sm:right-5 sm:w-[380px]"
       >
-        <div className="relative aspect-video">
-          <Portrait />
+        <div className="relative aspect-video bg-ink">
+          {clipFailed ? (
+            <>
+              <Portrait />
+              <audio key={`voice-${step}`} ref={voiceRef} src={current.audio} autoPlay muted={muted} onEnded={() => advance(step)} />
+            </>
+          ) : (
+            <video
+              key={`clip-${step}`}
+              ref={clipRef}
+              src={current.clip}
+              poster="/media/jasmin-office.jpg"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: "50% 25%" }}
+              autoPlay
+              playsInline
+              muted={muted}
+              onEnded={() => advance(step)}
+              onError={() => setClipFailed(true)}
+            />
+          )}
           <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[0.6rem] tracking-[0.2em]">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" /> GUIDED TOUR
           </div>
+          <button
+            onClick={() => setMuted(!muted)}
+            className="absolute right-3 top-3 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[0.6rem] tracking-[0.2em] hover:text-gold"
+            aria-label={muted ? "Turn Jasmin's voice on" : "Mute Jasmin"}
+          >
+            {muted ? "SOUND OFF" : "SOUND ON"}
+          </button>
           <div className="absolute bottom-3 left-3 text-xs">
             <p className="font-semibold">{JASMIN.name}</p>
             <p className="text-muted">{JASMIN.title}</p>

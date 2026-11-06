@@ -1,11 +1,13 @@
 // The guided tour: what Jasmin says and where the page goes while she says it.
-// Captions now; each line gets her recorded voice and lip-synced clip later.
+// Captions match media/voice-lines.json exactly: change both together.
 
 import type { StageAction } from "@/lib/stage";
 
-export type TourStep = { say: string; actions: StageAction[] };
+type Step = { say: string; actions: StageAction[] };
+export type TourStep = Step & { audio: string; clip: string };
 
-export const tour: TourStep[] = [
+// Her recorded voice (media/voice-lines.json → tour-NN) and the lip-synced clip of it.
+const steps: Step[] = [
   {
     say: "Hi, I'm Jasmin, Gasan's AI Chief of Staff. Let me walk you through what he has built this year. You can pause or skip at any time.",
     actions: [{ type: "go_home" }],
@@ -43,3 +45,8 @@ export const tour: TourStep[] = [
     actions: [{ type: "back_to_overview" }],
   },
 ];
+
+export const tour: TourStep[] = steps.map((step, i) => {
+  const id = `tour-${String(i + 1).padStart(2, "0")}`;
+  return { ...step, audio: `/media/voice/${id}.mp3`, clip: `/media/talk/${id}.mp4` };
+});

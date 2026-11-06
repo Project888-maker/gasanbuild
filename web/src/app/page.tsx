@@ -3,6 +3,8 @@ import Film from "@/components/Film";
 import JasminButton from "@/components/JasminButton";
 import ProjectCard from "@/components/ProjectCard";
 import Counter from "@/components/Counter";
+import StoryReel from "@/components/StoryReel";
+import GreetingPlayer from "@/components/GreetingPlayer";
 import { projects } from "@/content/projects";
 import { JASMIN } from "@/content/jasmin";
 
@@ -60,9 +62,7 @@ export default function Home() {
       <section id="jasmin" className="relative mx-auto max-w-7xl px-4 py-28 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr]">
           <div data-reveal className="relative overflow-hidden rounded-[28px] border border-line shadow-2xl shadow-black/60">
-            <div className="aspect-video">
-              <Film src="/media/jasmin-office.mp4" poster="/media/jasmin-office.jpg" position="50% 30%" alt="Jasmin at her desk in a skyscraper office" />
-            </div>
+            <GreetingPlayer />
             <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-black/55 px-3 py-1.5 font-mono text-[0.62rem] tracking-[0.2em] backdrop-blur">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> ONLINE
             </div>
@@ -121,6 +121,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <StoryReel />
 
       {/* How I build */}
       <section id="how" className="relative overflow-hidden border-t border-line">

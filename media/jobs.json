@@ -7,8 +7,8 @@
   },
   {
     "id": "jasmin-office",
-    "reference": "src/jasmin_ref_from_screenshot.jpg",
-    "image_prompt": "Keep the adult woman from the reference image exactly the same person: same face, facial features, long dark curly hair, brown eyes and skin tone. New photo of her: she sits at a sleek walnut desk in a corner office on a high floor of a modern skyscraper at dusk, wearing a tailored black blazer over an ivory silk blouse, small gold earrings, hair neat and glossy. Floor-to-ceiling windows behind her show a glittering city skyline at blue hour. Webcam framing of a professional video call: waist up, centred, facing the camera, looking straight into the lens with a warm, confident, professional smile, mouth closed. Soft warm key light on her face, realistic skin texture, photorealistic, the photo fills the whole frame, no text, no logos, no laptop in front of her.",
+    "reference": "src/jasmin_reference.jpg",
+    "image_prompt": "Keep the adult woman from the reference image exactly the same person: same face, facial features, long dark wavy hair, brown eyes, light freckles and warm skin tone. New photo of her: she sits at a sleek walnut desk in a corner office on a high floor of a modern skyscraper at dusk, wearing a tailored black blazer over an ivory silk blouse, small gold earrings, hair glossy and neatly styled over her shoulders. Floor-to-ceiling windows behind her show a glittering city skyline at blue hour. Webcam framing of a professional video call: waist up, centred, facing the camera, looking straight into the lens with a warm, confident, professional smile, mouth closed. Soft warm key light on her face, realistic skin texture, photorealistic, the photo fills the whole frame, no text, no logos, no laptop in front of her.",
     "video_prompt": "Static webcam shot of a professional video call, the camera never moves. She listens attentively with a warm, confident smile: small nods, natural blinking and breathing, a slight head tilt. Her mouth stays closed, she is not talking. City lights twinkle softly behind her. Natural, realistic, subtle.",
     "seconds": 10
   },
@@ -45,5 +45,35 @@
   {
     "id": "brightpath",
     "image_prompt": "A calm sunlit home study corner in the morning: a wooden desk with open books, a notebook, a tablet and a small plant, soft warm light through linen curtains, gentle pastel tones, peaceful and focused, editorial interior photography, no people, no text, no letters, no logos."
+  },
+  {
+    "id": "story-judo",
+    "image_prompt": "A lone judo athlete in a white judogi seen from behind, standing at the edge of an empty tatami in a dim sports hall, a single shaft of window light, quiet determination, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
+  },
+  {
+    "id": "story-stage",
+    "image_prompt": "A muscular bodybuilder seen from behind, silhouetted on a dark competition stage facing bright spotlights and a blurred audience, haze in the light beams, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
+  },
+  {
+    "id": "story-china",
+    "image_prompt": "A speaker seen from behind on a huge stage in an arena in China, facing thousands of people in the dark, a giant blank glowing screen above, warm stage lights, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
+  },
+  {
+    "id": "story-fleet",
+    "image_prompt": "A row of eight white unbranded delivery vans parked at dawn in a London industrial yard, wet tarmac reflecting the sunrise, a lone figure walking away, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
+  },
+  {
+    "id": "story-turkey",
+    "image_prompt": "A woman's hand holding a phone full of chat bubbles beside a sunlit window overlooking the Bosphorus in Istanbul at golden hour, out of focus clinic interior, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
+  },
+  {
+    "id": "story-build",
+    "image_prompt": "A man seen from behind working late at night at a desk with two monitors full of code and an AI chat, London city lights through the window, warm desk lamp, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+    "aspect": "3:2"
   }
 ]

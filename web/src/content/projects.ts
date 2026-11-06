@@ -189,7 +189,7 @@ export const projects: Project[] = [
       "AI Movie Director is a branded product on top of a real-time world model on fal. Users sign up, top up with Stripe, upload character references and direct a live film that streams back over WebRTC at 24 frames a second. Typed or spoken directions steer the story. An AI Director agent plans scenes and budgets, and a Create playground offers dozens of image, video and audio tools.",
     group: "platforms",
     status: "live",
-    statusNote: "Built and deployed.",
+    statusNote: "Live: sign up, top up and direct a film.",
     accent: "#FF6B5B",
     poster: "/media/moviedirector.jpg",
     steps: [
@@ -211,7 +211,7 @@ export const projects: Project[] = [
       { title: "An AI Director that asks first", text: "The Director agent plans shots and budgets, and spending actions wait for the user's approval." },
     ],
     stack: ["Next.js", "Prisma + Postgres", "Stripe", "fal realtime (WebRTC)", "Claude (Director agent)", "Vercel"],
-    links: [],
+    links: [{ label: "aimoviedirector.vercel.app", href: "https://aimoviedirector.vercel.app/director" }],
   },
   {
     slug: "hivemind",

@@ -150,5 +150,98 @@
     },
     "url": "https://v3b.fal.media/files/b/0ab14f26/61yJXVcERYhJkEht0K_Nv_output.mp4",
     "seconds": 417
+  },
+  {
+    "model": "fal-ai/nano-banana-pro/edit",
+    "arguments": {
+      "prompt": "Keep the adult woman from the reference image exactly the same person: same face, facial features, long dark wavy hair, brown eyes, light freckles and warm skin tone. New photo of her: she sits at a sleek walnut desk in a corner office on a high floor of a modern skyscraper at dusk, wearing a tailored black blazer over an ivory silk blouse, small gold earrings, hair glossy and neatly styled over her shoulders. Floor-to-ceiling windows behind her show a glittering city skyline at blue hour. Webcam framing of a professional video call: waist up, centred, facing the camera, looking straight into the lens with a warm, confident, professional smile, mouth closed. Soft warm key light on her face, realistic skin texture, photorealistic, the photo fills the whole frame, no text, no logos, no laptop in front of her.",
+      "aspect_ratio": "16:9",
+      "resolution": "2K",
+      "num_images": 1,
+      "image_urls": [
+        "<inline image>"
+      ]
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fd0/Lc3VjBRPVxNGoXYj4Ynsm_azV3YRBj.png",
+    "seconds": 23
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A speaker seen from behind on a huge stage in an arena in China, facing thousands of people in the dark, a giant blank glowing screen above, warm stage lights, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdd/7obtCA6C9gUHEGaP5T9zj_AXEzeVAm.png",
+    "seconds": 23
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A lone judo athlete in a white judogi seen from behind, standing at the edge of an empty tatami in a dim sports hall, a single shaft of window light, quiet determination, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdd/lQTo0b7ZDe_KUXzkF68vs_Tz9NO8Il.png",
+    "seconds": 24
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A row of eight white unbranded delivery vans parked at dawn in a London industrial yard, wet tarmac reflecting the sunrise, a lone figure walking away, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdd/D6SAd-VG2tgk1Uhbgq40S_9Obkotzo.png",
+    "seconds": 24
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A muscular bodybuilder seen from behind, silhouetted on a dark competition stage facing bright spotlights and a blurred audience, haze in the light beams, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdd/90nYiSYccCpHF9sHKjgTI_jnR0GAjT.png",
+    "seconds": 29
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A man seen from behind working late at night at a desk with two monitors full of code and an AI chat, London city lights through the window, warm desk lamp, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdf/MLVFCzMtHOtPG-qIGmEH1_tGAJHDbJ.png",
+    "seconds": 25
+  },
+  {
+    "model": "fal-ai/nano-banana-pro",
+    "arguments": {
+      "prompt": "A woman's hand holding a phone full of chat bubbles beside a sunlit window overlooking the Bosphorus in Istanbul at golden hour, out of focus clinic interior, cinematic film still, anamorphic lens, shallow depth of field, moody natural light, subtle film grain, photorealistic, no text, no letters, no logos, no visible faces.",
+      "aspect_ratio": "3:2",
+      "resolution": "2K",
+      "num_images": 1
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14fdf/PNHAlFQZir7ECAr_ZTg5s_XuEAPDOG.png",
+    "seconds": 25
+  },
+  {
+    "model": "fal-ai/kling-video/v3/pro/image-to-video",
+    "arguments": {
+      "prompt": "Static webcam shot of a professional video call, the camera never moves. She listens attentively with a warm, confident smile: small nods, natural blinking and breathing, a slight head tilt. Her mouth stays closed, she is not talking. City lights twinkle softly behind her. Natural, realistic, subtle.",
+      "duration": "10",
+      "aspect_ratio": "16:9",
+      "generate_audio": false,
+      "image_url": "<inline image>",
+      "start_image_url": "<inline image>"
+    },
+    "url": "https://v3b.fal.media/files/b/0ab14ffb/QIhZMNN8eThmyibw047uY_output.mp4",
+    "seconds": 407
   }
 ]

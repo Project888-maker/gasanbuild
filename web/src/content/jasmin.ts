@@ -4,6 +4,7 @@
 // in this folder.
 
 import { projects, STATUS_LABEL } from "./projects";
+import { chapters, POSITIONS, WHY } from "./story";
 
 export const JASMIN = {
   name: "Jasmin",
@@ -31,6 +32,16 @@ What he is open to: building AI products and agents with companies, founders and
 AI receptionists, operator agents, internal tools, marketplaces and AI-powered platforms.
 To work with him, request a live interview on this site, and Gasan follows up personally.
 `.trim();
+
+// His story in his own words (first person). Jasmin retells it in the third person.
+function story(): string {
+  return [
+    ...chapters.map((c) => `${c.place}, ${c.title}: ${c.text}`),
+    `Why: ${WHY}`,
+    ...POSITIONS.map((p) => `What he believes: ${p}`),
+    "Never discuss: his health, his family, his personal income, or any live negotiation.",
+  ].join("\n");
+}
 
 function dossier(): string {
   return projects
@@ -80,6 +91,9 @@ Helpful moves:
 
 # ABOUT GASAN
 ${ABOUT_GASAN}
+
+# GASAN'S STORY (his words; retell it warmly, in the third person, when asked who he is or why he builds)
+${story()}
 
 # PROJECTS
 ${dossier()}`;
