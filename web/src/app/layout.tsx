@@ -15,7 +15,15 @@ export const metadata: Metadata = {
   title: { default: "Gasan builds AI", template: "%s · Gasan builds AI" },
   description:
     "Autonomous agents, real-time voice and video AI, platforms and games. Ten products built and shipped by Gasan, presented by Jasmin, his AI Chief of Staff.",
-  openGraph: { images: ["/media/opening.jpg"] },
+  // The card LinkedIn, WhatsApp and Telegram show when the portfolio is shared.
+  openGraph: {
+    type: "website",
+    siteName: "Gasan builds AI",
+    title: "Gasan builds AI that does the work",
+    description: "Ten AI products shipped end to end: agents, voice and video AI, platforms and games. Interview Jasmin, his AI Chief of Staff.",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Gasan builds AI: ten projects and Jasmin, AI Chief of Staff" }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og.jpg"] },
 };
 
 export const viewport: Viewport = { themeColor: "#07080b" };

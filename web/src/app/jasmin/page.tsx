@@ -7,6 +7,7 @@ import { JASMIN } from "@/content/jasmin";
 export const metadata: Metadata = {
   title: "Meet Jasmin",
   description: "Jasmin, Gasan's AI Chief of Staff: chat with her, take her guided tour, or request a live video interview.",
+  openGraph: { images: [{ url: "/og.jpg", width: 1200, height: 630 }] },
 };
 
 const STEPS = [
