@@ -14,7 +14,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { Room } from "livekit-client";
+import type { RemoteTrack, Room } from "livekit-client";
 import { PRESENTER_URL, announceLive, type LiveRequest } from "@/lib/live";
 import { runAction, type StageAction } from "@/lib/stage";
 import { scrollToTarget } from "@/components/Motion";
@@ -119,8 +119,12 @@ export default function LiveInterview() {
   const nextTime = useRef(0);
   const rate = useRef(24000);
   const lk = useRef<Room | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  // Her avatar's tracks, kept so they can be attached again: switching between the
+  // full view and the corner window makes React create new <video> elements.
+  const herVideo = useRef<RemoteTrack | null>(null);
+  const herAudio = useRef<RemoteTrack | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const mutedRef = useRef(false);
   const lastLoud = useRef(0);
@@ -188,6 +192,46 @@ export default function LiveInterview() {
   };
 
   // ---------- her avatar (LemonSlice in a LiveKit room)
+  const showVideo = (v: HTMLVideoElement) => {
+    const track = herVideo.current;
+    if (!track) return;
+    v.muted = true;
+    v.playsInline = true;
+    track.attach(v);
+    v.play().catch((e) => {
+      setNeedTap(true);
+      log(`avatar video needs a tap: ${e.name}`);
+    });
+    // A phone can attach the video and still show no frames.
+    setTimeout(() => {
+      if (videoRef.current === v && herVideo.current === track && (v.paused || !v.videoWidth)) {
+        setNeedTap(true);
+        log("avatar video: no frames after 6 s");
+      }
+    }, 6000);
+  };
+  const playVoice = (el: HTMLAudioElement) => {
+    const track = herAudio.current;
+    if (!track) return;
+    track.attach(el);
+    el.muted = false;
+    el.play().catch(() => setNeedTap(true));
+  };
+  // Every <video>/<audio> React creates for her gets her tracks again. Stable
+  // callbacks (they only touch refs), so a re-render doesn't re-attach them.
+  const bindVideo = useCallback((el: HTMLVideoElement | null) => {
+    if (videoRef.current && videoRef.current !== el) herVideo.current?.detach(videoRef.current);
+    videoRef.current = el;
+    if (el) showVideo(el);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const bindAudio = useCallback((el: HTMLAudioElement | null) => {
+    if (audioRef.current && audioRef.current !== el) herAudio.current?.detach(audioRef.current);
+    audioRef.current = el;
+    if (el) playVoice(el);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const watchAvatar = async (info: { url: string; token: string; identity: string }, attempt = 1) => {
     try {
       const LK = await import("livekit-client");
@@ -195,31 +239,28 @@ export default function LiveInterview() {
       const room = new LK.Room({ adaptiveStream: false, dynacast: false });
       room.on(LK.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
         if (participant.identity !== info.identity) return;
-        if (track.kind === LK.Track.Kind.Video && videoRef.current) {
-          const v = videoRef.current;
-          v.muted = true;
-          v.playsInline = true;
-          track.attach(v);
-          v.play().catch((e) => {
-            setNeedTap(true);
-            log(`avatar video needs a tap: ${e.name}`);
-          });
+        if (track.kind === LK.Track.Kind.Video) {
+          herVideo.current = track;
+          if (videoRef.current) showVideo(videoRef.current);
           setAvatarOn(true);
           log(`avatar video on (${navigator.userAgent.slice(0, 120)})`);
-        } else if (track.kind === LK.Track.Kind.Audio && audioRef.current && ctx.current) {
+        } else if (track.kind === LK.Track.Kind.Audio && ctx.current) {
           // Her voice plays from the <audio> element: the browser's echo
           // cancellation only removes sound it plays that way.
-          const el = audioRef.current;
-          track.attach(el);
-          el.muted = false;
-          el.play().catch(() => setNeedTap(true));
+          herAudio.current = track;
+          if (audioRef.current) playVoice(audioRef.current);
           avatarSource.current?.disconnect();
           avatarSource.current = ctx.current.createMediaStreamSource(new MediaStream([track.mediaStreamTrack]));
           if (analyser.current) avatarSource.current.connect(analyser.current);
         }
       });
       room.on(LK.RoomEvent.TrackUnsubscribed, (track, _pub, participant) => {
-        if (participant.identity === info.identity && track.kind === LK.Track.Kind.Video) setAvatarOn(false);
+        if (participant.identity !== info.identity) return;
+        track.detach();
+        if (track.kind === LK.Track.Kind.Video) {
+          herVideo.current = null;
+          setAvatarOn(false);
+        } else if (track.kind === LK.Track.Kind.Audio) herAudio.current = null;
       });
       room.on(LK.RoomEvent.AudioPlaybackStatusChanged, () => {
         if (!room.canPlaybackAudio) setNeedTap(true);
@@ -265,8 +306,10 @@ export default function LiveInterview() {
     ctx.current = null;
     wake.current?.release().catch(() => {});
     wake.current = null;
-    if (audioRef.current) audioRef.current.srcObject = null;
-    if (videoRef.current) videoRef.current.srcObject = null;
+    herVideo.current?.detach();
+    herAudio.current?.detach();
+    herVideo.current = null;
+    herAudio.current = null;
     setAvatarOn(false);
     setNeedTap(false);
     setEnded(ending(reason, (request.current?.name || "").split(" ")[0]));
@@ -455,13 +498,12 @@ export default function LiveInterview() {
         style={{ objectPosition: "50% 25%" }}
       />
       <video
-        ref={videoRef}
+        ref={bindVideo}
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${avatarOn ? "opacity-100" : "opacity-0"}`}
         style={{ objectPosition: "50% 20%" }}
         playsInline
         muted
       />
-      <audio ref={audioRef} />
       <div ref={ringRef} className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 shadow-[inset_0_0_0_2px_var(--color-gold)] transition-opacity duration-150" />
       {phase === "connecting" && (
         <div className="absolute inset-0 flex flex-col items-center justify-end bg-gradient-to-t from-black/85 via-black/20 to-transparent p-6 text-center">
@@ -497,17 +539,25 @@ export default function LiveInterview() {
     </div>
   );
 
+  // Her voice's <audio> sits outside the views, so it is never recreated.
+  const voice = <audio ref={bindAudio} />;
+
   if (pip) {
     return (
+      <>
+      {voice}
       <aside aria-label="Live interview with Jasmin" className="glass fixed bottom-3 right-3 z-[80] w-[176px] overflow-hidden rounded-2xl shadow-2xl shadow-black/70 sm:w-[230px]">
         {picture}
         {said && <p className="line-clamp-2 px-3 pt-2 text-[0.72rem] leading-snug text-white/85 sm:line-clamp-3">{said}</p>}
         {controls}
       </aside>
+      </>
     );
   }
 
   return (
+    <>
+    {voice}
     <div className="fixed inset-0 z-[80] flex flex-col items-center justify-center overflow-y-auto bg-ink/95 px-4 py-8 backdrop-blur" data-lenis-prevent role="dialog" aria-label="Live interview with Jasmin">
       <p className="eyebrow mb-4">Live interview · Jasmin, AI Chief of Staff</p>
       {picture}
@@ -540,5 +590,6 @@ export default function LiveInterview() {
       )}
       {phase !== "ended" && first && <p className="mt-4 text-xs text-muted">Headphones help Jasmin hear you clearly.</p>}
     </div>
+    </>
   );
 }
