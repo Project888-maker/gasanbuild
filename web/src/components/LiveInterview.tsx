@@ -173,12 +173,13 @@ export default function LiveInterview() {
 
   // Talking over her stops her voice at once. While she talks, her own voice
   // can leak into the mic, so it takes a clearly louder and longer voice.
+  // Returns true while the guest is clearly talking (over her, or on their turn).
   const bargeIn = (pcm: Int16Array) => {
     let sum = 0;
     for (let i = 0; i < pcm.length; i++) sum += pcm[i] * pcm[i];
     const rms = Math.sqrt(sum / pcm.length);
     const now = performance.now();
-    const herTurn = now - lastLoud.current < 400;
+    const herTurn = herVoicePlaying();
     if (rms > (herTurn ? 3200 : 1800)) {
       voicedSince.current = voicedSince.current || now;
       if (now - voicedSince.current > (herTurn ? 550 : 320)) {
@@ -187,8 +188,35 @@ export default function LiveInterview() {
           lastInterrupt.current = now;
           ws.current.send(JSON.stringify({ type: "interrupt" }));
         }
+        return true;
       }
     } else voicedSince.current = 0;
+    return false;
+  };
+
+  // Is her voice coming out of the speakers right now? (Her fallback voice is
+  // scheduled here; the avatar's is measured by the analyser.)
+  const herVoicePlaying = () => {
+    const audio = ctx.current;
+    const scheduled = !!audio && (sources.current.size > 0 || audio.currentTime < nextTime.current + 0.35);
+    return scheduled || performance.now() - lastLoud.current < 450;
+  };
+
+  // Echo guard: while she speaks, her voice from the speakers reaches the mic,
+  // and Hermes would hear it as the guest (she then answers herself, and the
+  // garbled echo comes back as another language). So while she speaks the mic
+  // sends silence, keeping the last 0.6 s; when the guest clearly talks over
+  // her, those 0.6 s go first so the start of their words isn't lost.
+  const held = useRef<Int16Array[]>([]);
+  const guardEcho = (pcm: Int16Array, talking: boolean): Int16Array[] => {
+    if (herVoicePlaying() && !talking) {
+      held.current = [...held.current, pcm.slice()].slice(-15);
+      pcm.fill(0);
+      return [pcm];
+    }
+    const out = [...held.current, pcm];
+    held.current = [];
+    return out;
   };
 
   // ---------- her avatar (LemonSlice in a LiveKit room)
@@ -382,9 +410,14 @@ export default function LiveInterview() {
           const worklet = new AudioWorkletNode(audio, "capture", { processorOptions: { target: rate.current } });
           worklet.port.onmessage = (m) => {
             const pcm = new Int16Array(m.data);
-            bargeIn(pcm);
-            if (mutedRef.current) pcm.fill(0); // keep the line open with silence
-            if (socket.readyState === 1) socket.send(pcm.buffer);
+            const talking = bargeIn(pcm);
+            if (mutedRef.current) {
+              pcm.fill(0); // keep the line open with silence
+              held.current = [];
+              if (socket.readyState === 1) socket.send(pcm.buffer);
+              return;
+            }
+            if (socket.readyState === 1) for (const frame of guardEcho(pcm, talking)) socket.send(frame);
           };
           if (mic.current) audio.createMediaStreamSource(mic.current).connect(worklet);
           worklet.connect(sink);
