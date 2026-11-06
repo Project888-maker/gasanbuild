@@ -21,7 +21,7 @@ import { scrollToTarget } from "@/components/Motion";
 import { projects } from "@/content/projects";
 
 type Phase = "idle" | "connecting" | "live" | "ended";
-type Caption = { role: "user" | "assistant"; text: string };
+type Caption = { id: string; role: "user" | "assistant"; text: string };
 type Ending = { text: string; rejoin: boolean };
 
 const SLUGS = new Set(projects.map((p) => p.slug));
@@ -132,6 +132,8 @@ export default function LiveInterview() {
   const lastInterrupt = useRef(0);
   const wake = useRef<{ release: () => Promise<void> } | null>(null);
   const done = useRef(false);
+  // "room": the LiveKit interview with her agent; "socket": the older call over /presenter/ws.
+  const mode = useRef<"room" | "socket">("room");
 
   const first = (request.current?.name || "").split(" ")[0];
 
@@ -347,10 +349,126 @@ export default function LiveInterview() {
   }, []);
 
   const hangUp = () => {
+    if (mode.current === "room") {
+      finish("guest hung up"); // leaving the room ends her side and sends Gasan the summary
+      return;
+    }
     try {
       ws.current?.send(JSON.stringify({ type: "hangup" }));
     } catch {}
     setTimeout(() => finish("guest hung up"), 1500);
+  };
+
+  // ---------- events from her side (both kinds of call)
+  const onEvent = (msg: { type?: string; [key: string]: unknown }) => {
+    if (msg.type === "status") setStatus(String(msg.text || ""));
+    else if (msg.type === "ready") {
+      setLeft(Number(msg.seconds_left) || 0);
+      setPhase("live");
+      setStatus("");
+      const nav = navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> } };
+      nav.wakeLock?.request("screen").then((w) => (wake.current = w)).catch(() => {});
+    } else if (msg.type === "stage") {
+      const action = allowed(msg.action as StageAction);
+      if (action) {
+        setView("pip");
+        void runAction(action, router, (el) => scrollToTarget(el, -120));
+      }
+    } else if (msg.type === "ended") finish(String(msg.reason || ""));
+  };
+
+  // One caption per spoken segment, updated as it grows.
+  const showCaption = (id: string, role: Caption["role"], text: string) =>
+    setCaptions((list) => {
+      const at = list.findIndex((c) => c.id === id);
+      if (at >= 0) return list.map((c, i) => (i === at ? { ...c, text: text.slice(-400) } : c));
+      return [...list, { id, role, text: text.slice(-400) }].slice(-6);
+    });
+
+  // ---------- the LiveKit interview: her agent joins the guest's room
+  const startRoom = async (ticket: { url: string; token: string }, req: LiveRequest) => {
+    mode.current = "room";
+    const LK = await import("livekit-client");
+    const room = new LK.Room({
+      adaptiveStream: false,
+      dynacast: false,
+      audioCaptureDefaults: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    });
+    lk.current = room;
+    let ready = false;
+    const decoder = new TextDecoder();
+    room.on(LK.RoomEvent.TrackSubscribed, (track) => {
+      if (track.kind === LK.Track.Kind.Video) {
+        herVideo.current = track;
+        if (videoRef.current) showVideo(videoRef.current);
+        setAvatarOn(true);
+      } else if (track.kind === LK.Track.Kind.Audio) {
+        herAudio.current = track;
+        if (audioRef.current) playVoice(audioRef.current);
+        if (ctx.current && analyser.current) {
+          avatarSource.current?.disconnect();
+          avatarSource.current = ctx.current.createMediaStreamSource(new MediaStream([track.mediaStreamTrack]));
+          avatarSource.current.connect(analyser.current);
+        }
+      }
+    });
+    room.on(LK.RoomEvent.TrackUnsubscribed, (track) => {
+      track.detach();
+      if (track === herVideo.current) {
+        herVideo.current = null;
+        setAvatarOn(false);
+      } else if (track === herAudio.current) herAudio.current = null;
+    });
+    room.on(LK.RoomEvent.AudioPlaybackStatusChanged, () => {
+      if (!room.canPlaybackAudio) setNeedTap(true);
+    });
+    room.on(LK.RoomEvent.DataReceived, (payload, _participant, _kind, topic) => {
+      if (topic !== "jasmin" || lk.current !== room) return;
+      try {
+        const msg = JSON.parse(decoder.decode(payload));
+        if (msg.type === "ready") ready = true;
+        onEvent(msg);
+      } catch {}
+    });
+    room.registerTextStreamHandler("lk.transcription", async (reader, participant) => {
+      const attrs = reader.info.attributes || {};
+      const mine = room.localParticipant.getTrackPublication(LK.Track.Source.Microphone)?.trackSid;
+      const role: Caption["role"] =
+        participant.identity === room.localParticipant.identity || (!!mine && attrs["lk.transcribed_track_id"] === mine)
+          ? "user"
+          : "assistant";
+      const id = attrs["lk.segment_id"] || reader.info.id;
+      let text = "";
+      for await (const chunk of reader) {
+        text += chunk;
+        showCaption(id, role, text);
+      }
+    });
+    room.on(LK.RoomEvent.Disconnected, () => {
+      if (lk.current === room) finish("dropped");
+    });
+    try {
+      await room.connect(ticket.url, ticket.token);
+    } catch {
+      if (lk.current === room) finish("dropped");
+      return;
+    }
+    try {
+      await room.localParticipant.setMicrophoneEnabled(true);
+    } catch {
+      finish("mic");
+      return;
+    }
+    room.startAudio().catch(() => setNeedTap(true));
+    setStatus("Jasmin is joining…");
+    // Her agent should be in within seconds; if it never comes, the older call takes over.
+    setTimeout(() => {
+      if (!ready && lk.current === room && !done.current) {
+        lk.current = null;
+        void room.disconnect();
+        void startSocket(req);
+      }
+    }, 45_000);
   };
 
   // ---------- starting
@@ -368,8 +486,45 @@ export default function LiveInterview() {
       mutedRef.current = false;
       setView("full");
       setPhase("connecting");
-      setStatus("Allow your microphone so Jasmin can hear you…");
+      setStatus("Connecting you to Jasmin…");
       announceLive(true);
+      // Made inside the guest's click, so the browser lets it play.
+      const audio = new AudioContext();
+      ctx.current = audio;
+      void audio.resume().catch(() => {});
+      outGain.current = audio.createGain();
+      analyser.current = audio.createAnalyser();
+      analyser.current.fftSize = 1024;
+      outGain.current.connect(audio.destination);
+      outGain.current.connect(analyser.current);
+
+      let joined: Response | null = null;
+      try {
+        joined = await fetch(`${PRESENTER_URL}/presenter/join`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ invite: req.token, name: req.name.split(" ")[0] }),
+        });
+      } catch {}
+      if (done.current) return;
+      if (joined?.ok) return startRoom(await joined.json(), req);
+      if (joined && (joined.status === 401 || joined.status === 403)) return finish("link");
+      if (joined?.status === 410) return finish("used up");
+      if (joined?.status === 429) return finish("busy");
+      // The agent service is off (503) or Hermes is older (404): the older call.
+      return startSocket(req);
+    },
+    // startRoom/startSocket only touch refs and stable setters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [phase, finish, router],
+  );
+
+  // ---------- the older call: audio over Hermes's /presenter/ws
+  const startSocket = async (req: LiveRequest) => {
+      mode.current = "socket";
+      const audio = ctx.current;
+      if (!audio || done.current) return;
+      setStatus("Allow your microphone so Jasmin can hear you…");
       try {
         mic.current = await navigator.mediaDevices.getUserMedia({
           audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
@@ -378,14 +533,6 @@ export default function LiveInterview() {
         finish("mic");
         return;
       }
-      const audio = new AudioContext();
-      ctx.current = audio;
-      await audio.resume().catch(() => {});
-      outGain.current = audio.createGain();
-      analyser.current = audio.createAnalyser();
-      analyser.current.fftSize = 1024;
-      outGain.current.connect(audio.destination);
-      outGain.current.connect(analyser.current);
       const url = URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" }));
       await audio.audioWorklet.addModule(url);
 
@@ -400,8 +547,7 @@ export default function LiveInterview() {
           return;
         }
         const msg = JSON.parse(e.data);
-        if (msg.type === "status") setStatus(msg.text || "");
-        else if (msg.type === "ready") {
+        if (msg.type === "ready") {
           rate.current = msg.rate || 24000;
           if (msg.avatar) void watchAvatar(msg.avatar);
           const sink = audio.createGain();
@@ -421,26 +567,17 @@ export default function LiveInterview() {
           };
           if (mic.current) audio.createMediaStreamSource(mic.current).connect(worklet);
           worklet.connect(sink);
-          setLeft(Number(msg.seconds_left) || 0);
-          setPhase("live");
-          setStatus("");
-          const nav = navigator as Navigator & { wakeLock?: { request: (t: "screen") => Promise<{ release: () => Promise<void> }> } };
-          nav.wakeLock?.request("screen").then((w) => (wake.current = w)).catch(() => {});
-        } else if (msg.type === "stage") {
-          const action = allowed(msg.action as StageAction);
-          if (action) {
-            setView("pip");
-            void runAction(action, router, (el) => scrollToTarget(el, -120));
-          }
+          onEvent(msg);
         } else if (msg.type === "caption") {
+          // The older call sends deltas: they grow the latest caption of that speaker.
           const role: Caption["role"] = msg.role === "user" ? "user" : "assistant";
           setCaptions((list) => {
             const last = list[list.length - 1];
-            if (last && last.role === role) return [...list.slice(0, -1), { role, text: (last.text + msg.delta).slice(-400) }];
-            return [...list, { role, text: String(msg.delta) }].slice(-4);
+            if (last && last.role === role) return [...list.slice(0, -1), { ...last, text: (last.text + msg.delta).slice(-400) }];
+            return [...list, { id: `s${Date.now()}`, role, text: String(msg.delta) }].slice(-6);
           });
         } else if (msg.type === "flush") flush();
-        else if (msg.type === "ended") finish(String(msg.reason || ""));
+        else onEvent(msg);
       };
       socket.onclose = (e) => {
         if (ws.current === socket) finish(e.code === 4401 || e.code === 4403 ? "link" : "dropped");
@@ -448,11 +585,7 @@ export default function LiveInterview() {
       socket.onerror = () => {
         if (ws.current === socket) finish("dropped");
       };
-    },
-    // play/bargeIn/watchAvatar only touch refs.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phase, finish, router],
-  );
+  };
 
   useEffect(() => {
     const onStart = (e: Event) => void start((e as CustomEvent<LiveRequest>).detail);
@@ -462,7 +595,13 @@ export default function LiveInterview() {
 
   // Tell Jasmin which page the guest is on (she moves it, they can too).
   useEffect(() => {
-    if (phase === "live" && ws.current?.readyState === 1) ws.current.send(JSON.stringify({ type: "page", path: where(pathname) }));
+    if (phase !== "live") return;
+    const path = where(pathname);
+    if (mode.current === "room" && lk.current) {
+      void lk.current.localParticipant
+        .publishData(new TextEncoder().encode(JSON.stringify({ path })), { reliable: true, topic: "page" })
+        .catch(() => {});
+    } else if (ws.current?.readyState === 1) ws.current.send(JSON.stringify({ type: "page", path }));
   }, [pathname, phase]);
 
   // The countdown, and a warning before leaving the site mid-call.
@@ -508,6 +647,7 @@ export default function LiveInterview() {
   const toggleMute = () => {
     mutedRef.current = !mutedRef.current;
     setMuted(mutedRef.current);
+    if (mode.current === "room") void lk.current?.localParticipant.setMicrophoneEnabled(!mutedRef.current).catch(() => {});
   };
   // Her current words: the last two sentences she has started saying.
   const said = ([...captions].reverse().find((c) => c.role === "assistant")?.text || "")
