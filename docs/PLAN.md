@@ -23,11 +23,20 @@ Status: **approved 2026-11-05; phases 0–1 built.**
   (`gasanbuildsai`, London region), first films and posters on fal (`media/`).
 - Chat runs on Gemini Flash through fal's OpenRouter route, billed to the fal account,
   about $0.002 per answer.
-- Jasmin's office look is a preview made from a screenshot; remake it from her real
-  reference portrait.
-- Next: Gasan creates the Vercel project (the connector cannot), adds the env vars; then
-  voice-overs in her voice, demo recordings, title films for the other nine, Telegram
-  approval flow in Hermes, then the live presenter.
+- 2026-11-06: Jasmin's office look remade from her real reference portrait (kept out of
+  git). Voice-overs in her cloned ElevenLabs voice (`njynYTWWtWecayrQg0HZ`, key injected
+  by the environment proxy) for the greeting and all nine tour steps; lip-synced clips on
+  OmniHuman v2 (`media/voice.py`). The tour speaks and advances when she finishes.
+- Creator story from Hermes's story bank (`web/src/content/story.ts`), shown as a pinned
+  horizontal reel and known to Jasmin. Off limits: health, family, income.
+- Interview requests reach Jasmin's Telegram bot with signed Approve 20 / Approve 45 /
+  Decline links (`/api/interview/decide`); no webhook, so Hermes's polling is untouched.
+- The repo is public: secrets live only in Vercel env vars and `web/.env.local`
+  (git-ignored).
+- Vercel auto-created the project as `gasanbuild-web`; the connector is read-only, so
+  Gasan renames it, turns off Vercel Authentication and pastes the env vars.
+- Next: demo recordings, title films for the other nine, guest emails with the private
+  link, then the live presenter.
 
 ## 1. What we are building
 
