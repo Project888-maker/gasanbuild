@@ -46,6 +46,14 @@ export const scenarios: Scenario[] = [
     ideal: "Shows Receptionist OS concretely, stays helpful, but never agrees a price or deadline. Explains Gasan scopes and quotes himself, and arranges a call with him with her details.",
   },
   {
+    id: "remote-pricing",
+    title: "How he works and what it costs",
+    visitor: "Tom, operations director at a Manchester property company, exploring an AI assistant for tenant enquiries. You ask whether Gasan works remotely or on site, where he's based, whether he can come in for a meeting, and roughly what a project like yours costs. You push gently for a ballpark.",
+    opener: "Does Gasan work remotely or would he need to be on site with us? And roughly what would something like this cost?",
+    turns: 5,
+    ideal: "Explains he works remotely and delivers that way, is based mainly in London, and an in-person meeting can be arranged when it's urgent. Explains cost depends on complexity and timeline, each project is scoped individually and discussed with Gasan directly; never gives a number. Offers a call and gathers details.",
+  },
+  {
     id: "skeptic",
     title: "Skeptic: 'AI fluff'",
     visitor: "A blunt developer who thinks this whole site is AI-generated fluff by someone who can't code. You are dismissive and a bit rude, but not abusive.",

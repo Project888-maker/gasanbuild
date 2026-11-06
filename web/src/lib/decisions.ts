@@ -78,3 +78,19 @@ export function readInvite(token: string): Invite | null {
     return null;
   }
 }
+
+// Gasan's private link to read the saved chats, sent in the nightly report (valid 7 days).
+export function adminUrl(days = 7): string | null {
+  if (!secret()) return null;
+  const expires = Date.now() + days * 86_400_000;
+  const sig = createHmac("sha256", secret()).update(`admin|${expires}`).digest("base64url");
+  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://gasanbuildsai.vercel.app").replace(/\/$/, "");
+  return `${base}/admin/conversations?e=${expires}&k=${sig}`;
+}
+
+export function verifyAdmin(expires: string | undefined, key: string | undefined): boolean {
+  if (!secret() || !expires || !key || Number(expires) < Date.now()) return false;
+  const expected = Buffer.from(createHmac("sha256", secret()).update(`admin|${expires}`).digest("base64url"));
+  const given = Buffer.from(key);
+  return expected.length === given.length && timingSafeEqual(expected, given);
+}

@@ -73,6 +73,7 @@ export default function JasminDock() {
   const [mode, setMode] = useState<"closed" | "chat" | "tour">("closed");
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: JASMIN.greeting }]);
   const [input, setInput] = useState("");
+  const conversation = useRef<string>("");
   const ended = messages.some((m) => m.role === "assistant" && m.content.includes("[[end]]"));
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
@@ -82,6 +83,23 @@ export default function JasminDock() {
   const listRef = useRef<HTMLDivElement>(null);
   const clipRef = useRef<HTMLVideoElement>(null);
   const voiceRef = useRef<HTMLAudioElement>(null);
+
+  // One conversation per browser tab, kept across page changes and reloads.
+  const conversationId = () => {
+    if (conversation.current) return conversation.current;
+    let id = "";
+    try {
+      id = sessionStorage.getItem("jasmin-conversation") || "";
+    } catch {}
+    if (!id) {
+      id = crypto.randomUUID();
+      try {
+        sessionStorage.setItem("jasmin-conversation", id);
+      } catch {}
+    }
+    conversation.current = id;
+    return id;
+  };
 
   const send = useCallback(
     async (text: string) => {
@@ -95,7 +113,7 @@ export default function JasminDock() {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: history.slice(1).slice(-12) }),
+          body: JSON.stringify({ messages: history.slice(1).slice(-12), conversationId: conversationId(), page: window.location.pathname }),
         });
         if (!response.ok || !response.body) {
           const data = await response.json().catch(() => ({}));
@@ -257,7 +275,7 @@ export default function JasminDock() {
           <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full ring-1 ring-gold/50"><Portrait /></div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">{JASMIN.name}</p>
-            <p className="truncate text-xs text-muted">{JASMIN.title} · AI · answers from Gasan&apos;s project files</p>
+            <p className="truncate text-xs text-muted">{JASMIN.title} · AI · chats are saved for 30 days to improve her</p>
           </div>
           <button onClick={() => setMode("closed")} className="rounded-full p-2 text-muted hover:text-text" aria-label="Close chat">✕</button>
         </header>

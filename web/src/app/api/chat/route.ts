@@ -65,8 +65,12 @@ export async function POST(request: Request) {
   if (!db || !key) {
     return reply(503, "My chat is being set up. In the meantime, take the guided tour or request a live interview.");
   }
-  const messages = clean(await request.json().catch(() => null));
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  const messages = clean(body);
   if (!messages) return reply(400, "I didn't catch a question there.");
+  // Saved for 30 days so Gasan can review how Jasmin is doing (no IP addresses).
+  const conversationId = typeof body?.conversationId === "string" && /^[0-9a-f-]{36}$/.test(body.conversationId) ? body.conversationId : null;
+  const page = typeof body?.page === "string" ? body.page.slice(0, 120) : "";
 
   const day = today();
   const visitor = visitorId(request);
@@ -160,6 +164,24 @@ export async function POST(request: Request) {
           ? cost(usage.prompt_tokens, usage.completion_tokens ?? 0)
           : cost(Math.ceil(chars / 3.2), Math.ceil(outChars / 3.2));
     await settle(actual).catch((e) => console.error("chat settle", e));
+    if (conversationId) {
+      const added = JSON.stringify([
+        { role: "user", content: messages[messages.length - 1].content },
+        { role: "assistant", content: full },
+      ]);
+      await db`
+        insert into chat_conversations (id, visitor, page, messages, turns, cost, request, ended)
+        values (${conversationId}, ${visitor}, ${page}, ${added}::jsonb, 1, ${actual},
+                ${full.includes("[[request")}, ${full.includes("[[end]]")})
+        on conflict (id) do update set
+          messages = chat_conversations.messages || excluded.messages,
+          turns = chat_conversations.turns + 1,
+          cost = chat_conversations.cost + excluded.cost,
+          request = chat_conversations.request or excluded.request,
+          ended = chat_conversations.ended or excluded.ended,
+          updated_at = now()
+        where chat_conversations.visitor = excluded.visitor`.catch((e) => console.error("chat save", e));
+    }
     // Jasmin ended the chat (repeated abuse or nonsense): no more messages today.
     if (full.includes("[[end]]")) {
       await db`update chat_visitors set messages = greatest(messages, ${VISITOR_LIMIT() + 1})

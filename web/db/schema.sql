@@ -35,3 +35,28 @@ alter table interview_requests
   add column if not exists kind text not null default 'interview' check (kind in ('interview', 'call')),
   add column if not exists note text not null default '',
   add column if not exists source text not null default 'form';
+
+-- 2026-11-06: saved chats (30 days, no IPs) and the nightly review.
+create table if not exists chat_conversations (
+  id uuid primary key,
+  visitor text not null,
+  started_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  page text not null default '',
+  messages jsonb not null default '[]'::jsonb,
+  turns integer not null default 0,
+  cost numeric(12, 6) not null default 0,
+  request boolean not null default false,
+  ended boolean not null default false,
+  review jsonb,
+  reviewed_at timestamptz
+);
+create index if not exists chat_conversations_updated on chat_conversations (updated_at);
+
+create table if not exists job_runs (
+  name text not null,
+  day date not null,
+  ran_at timestamptz not null default now(),
+  result jsonb,
+  primary key (name, day)
+);
