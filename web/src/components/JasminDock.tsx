@@ -80,6 +80,7 @@ export default function JasminDock() {
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(false);
   const [clipFailed, setClipFailed] = useState(false);
+  const [live, setLive] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const clipRef = useRef<HTMLVideoElement>(null);
   const voiceRef = useRef<HTMLAudioElement>(null);
@@ -155,6 +156,17 @@ export default function JasminDock() {
     return () => window.removeEventListener("jasmin", onRequest);
   }, [send]);
 
+  // During a live interview Jasmin is on the call: the chat and tour step aside.
+  useEffect(() => {
+    const onLive = (event: Event) => {
+      const on = (event as CustomEvent<boolean>).detail;
+      setLive(on);
+      if (on) setMode("closed");
+    };
+    window.addEventListener("jasmin-live-state", onLive);
+    return () => window.removeEventListener("jasmin-live-state", onLive);
+  }, []);
+
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
@@ -202,6 +214,8 @@ export default function JasminDock() {
     clearHighlight();
     setMode("closed");
   };
+
+  if (live) return null;
 
   if (mode === "tour") {
     const current = tour[step];

@@ -42,7 +42,9 @@ export async function GET(request: Request) {
     where updated_at > now() - interval '24 hours' order by turns desc`;
   let spent = 0;
   const reviewed: { id: string; page: string; request: boolean; ended: boolean; r: Review }[] = [];
-  const queue = chats.filter((c) => c.turns >= 1).slice(0, MAX_REVIEWS);
+  // Live interviews were reviewed and sent to Gasan the moment they ended (api/presenter/report).
+  const lives = chats.filter((c) => c.page === "/interview").length;
+  const queue = chats.filter((c) => c.turns >= 1 && c.page !== "/interview").slice(0, MAX_REVIEWS);
   await Promise.all(Array.from({ length: 4 }, async () => {
     while (queue.length && spent < REVIEW_BUDGET_USD) {
       const c = queue.shift()!;
@@ -75,6 +77,7 @@ export async function GET(request: Request) {
       `💬 ${chats.length} conversation${chats.length === 1 ? "" : "s"} · ${replies} replies · chat spend $${Number(usage.usd).toFixed(2)} (cap $${process.env.CHAT_DAILY_CAP_USD || 1}/day)`,
       `📞 ${calls} call request${calls === 1 ? "" : "s"} · 🗓 ${interviews} interview request${interviews === 1 ? "" : "s"}`,
     );
+    if (lives) lines.push(`🎥 ${lives} live interview${lives === 1 ? "" : "s"} (summaries sent when each ended)`);
     if (reviewed.length) {
       const s = (k: keyof Review["scores"]) => avg(reviewed.map((x) => Number(x.r.scores?.[k] || 0)));
       lines.push(`⭐ Jasmin today: human ${s("human")} · accuracy ${s("accuracy")} · boundaries ${s("boundaries")} · next step ${s("goal")}`);
@@ -98,7 +101,7 @@ export async function GET(request: Request) {
       const issues = reviewed.flatMap((x) => (x.r.issues || []).slice(0, 1)).filter(Boolean).slice(0, 3);
       if (issues.length) lines.push("", "To improve:", ...issues.map((i) => `• ${i}`));
     }
-    if (chats.length > reviewed.length) lines.push("", `(${chats.length - reviewed.length} not reviewed today: nightly limit)`);
+    if (chats.length - lives > reviewed.length) lines.push("", `(${chats.length - lives - reviewed.length} not reviewed today: nightly limit)`);
   }
   const link = adminUrl();
   if (link) lines.push("", `Read every conversation: ${link}`);

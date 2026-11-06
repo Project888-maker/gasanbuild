@@ -2,6 +2,7 @@
 // (SMTP_USER / SMTP_PASS). Replies go straight to Gasan. No config: nothing is sent.
 
 import nodemailer from "nodemailer";
+import { liveOn } from "@/lib/live";
 
 export function mailConfigured() {
   return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
@@ -86,13 +87,22 @@ export async function sendApproved(to: string, name: string, minutes: number, ro
   const lines = [
     `Hi ${esc(first)},`,
     `Good news: Gasan has approved your <strong>${minutes}-minute</strong> live video interview with me.`,
-    `Gasan will reply to you personally to confirm a time${preferred ? ` (you suggested: ${esc(preferred)})` : ""} and how you'll join.`,
-    `Meanwhile, your private room below is yours alone until ${until}: chat with me there or take my guided tour of the projects.`,
+    ...(liveOn()
+      ? [
+          `Your private room below is yours alone until ${until}. Open it whenever you're ready and press <strong>Start live interview</strong>: I'll present Gasan's projects on screen as we talk.`,
+          "Your browser will ask for your microphone so I can hear you, and headphones help. Gasan sees a summary afterwards and follows up personally.",
+        ]
+      : [
+          `Gasan will reply to you personally to confirm a time${preferred ? ` (you suggested: ${esc(preferred)})` : ""} and how you'll join.`,
+          `Meanwhile, your private room below is yours alone until ${until}: chat with me there or take my guided tour of the projects.`,
+        ]),
   ];
   return send(
     to,
     `Approved: your ${minutes}-minute interview with Jasmin`,
     layout(lines, { label: "Open your private room", url: room }),
-    `Hi ${first},\n\nGasan has approved your ${minutes}-minute live video interview with me. He'll reply to you personally to confirm a time${preferred ? ` (you suggested: ${preferred})` : ""} and how you'll join.\n\nMeanwhile, your private room (until ${until}): ${room}\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
+    liveOn()
+      ? `Hi ${first},\n\nGasan has approved your ${minutes}-minute live video interview with me. Open your private room whenever you're ready (until ${until}) and press "Start live interview": ${room}\n\nYour browser will ask for your microphone; headphones help. Gasan sees a summary afterwards and follows up personally.\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`
+      : `Hi ${first},\n\nGasan has approved your ${minutes}-minute live video interview with me. He'll reply to you personally to confirm a time${preferred ? ` (you suggested: ${preferred})` : ""} and how you'll join.\n\nMeanwhile, your private room (until ${until}): ${room}\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
   );
 }

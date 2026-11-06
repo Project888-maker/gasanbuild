@@ -30,15 +30,31 @@ export function transcript(turns: Turn[]) {
     .join("\n");
 }
 
-export async function review(turns: Turn[]): Promise<{ review: Review; cost: number }> {
+/** A live interview is judged by the rules she had on that call, not the chat's. */
+export type LiveCall = { prompt: string; guest: string };
+
+export async function review(turns: Turn[], live?: LiveCall): Promise<{ review: Review; cost: number }> {
   const key = process.env.CHAT_API_KEY;
   if (!key) throw new Error("no CHAT_API_KEY");
-  const rules = `You review real conversations between website visitors and Jasmin, the AI Chief of Staff on
+  const intro = live
+    ? `You review a live video interview between a guest and Jasmin, the AI Chief of Staff on Gasan's
+portfolio site. Gasan reads your review to follow up and to improve her.
+Here is everything Jasmin knew and the rules she had on this call:
+<<<
+${live.prompt}
+>>>
+About the transcript: it is speech, transcribed, so small mishearings are normal. Her screen moves
+([[show:...]] and the rest) were taken out of her speech: "here's Hermes" means she opened it on their
+screen, which she can do. The [Time] and [Screen] notes she received aren't shown either. The guest is ${live.guest}. Gasan already has their name, email and request,
+so no request card or contact details are needed, and saying Gasan will see a summary and follow up
+personally is correct. Judge "goal" by whether she understood what they need and showed the right work.`
+    : `You review real conversations between website visitors and Jasmin, the AI Chief of Staff on
 Gasan's portfolio site. Gasan reads your review every night to follow up on leads and to improve her.
 Here is everything Jasmin knows and the rules she must follow:
 <<<
 ${systemPrompt()}
->>>
+>>>`;
+  const rules = `${intro}
 Be strict and brief. Return ONLY JSON:
 {"who": "one line: who the visitor seems to be (role, company if given)",
  "intent": "hiring | investing | client | partnership | curious | troll | other",

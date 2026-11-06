@@ -4,6 +4,7 @@ import Motion from "@/components/Motion";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import JasminDock from "@/components/JasminDock";
+import LiveInterview from "@/components/LiveInterview";
 import "./globals.css";
 
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Footer />
         <JasminDock />
+        <LiveInterview />
       </body>
     </html>
   );

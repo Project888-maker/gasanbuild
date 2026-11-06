@@ -37,6 +37,23 @@ Status: **approved 2026-11-05; phases 0–1 built.**
   Gasan renames it, turns off Vercel Authentication and pastes the env vars.
 - Next: demo recordings, title films for the other nine, guest emails with the private
   link, then the live presenter.
+- 2026-11-06: **live interview built** (switched on by `NEXT_PUBLIC_PRESENTER_URL`):
+  - Hermes (`hermes-agent`, branch `claude/jasmin-presenter`): `interfaces/jasmin_presenter.py`
+    runs the call on the companion video-call pipeline (her ElevenLabs voice, LemonSlice
+    lip-sync avatar, voice activity, talk-over) at `/presenter/ws?invite=…`. It runs inside the
+    Hermes process but sealed off: it loads no Hermes memory, persona, Telegram history or
+    tools (a test checks the source), takes its instructions from the portfolio, and can only
+    move the guest's page. Minutes are capped per invite across reconnects; two calls at once.
+  - Portfolio: `/api/presenter/prompt` (her instructions for an approved guest) and
+    `/api/presenter/report` (transcript saved with the chats, reviewed, summary to Telegram),
+    both behind the shared secret; `LiveInterview` (site-wide, so the call survives page
+    moves; corner window while she shows pages) and the room's Start button.
+  - Tested end to end locally with the real presenter code and model: greeting, page moves,
+    price boundary, overview of all ten, goodbye and `[[end]]`, time limit, phone layout.
+    Transcription and voice were stand-ins (no OpenAI/ElevenLabs keys in the sandbox).
+  - To switch on: merge the Hermes branch, set `PRESENTER_SECRET` (= `INTERVIEW_SECRET`) and
+    `PORTFOLIO_URL` in Hermes's `.env`, then set `NEXT_PUBLIC_PRESENTER_URL` (Hermes's public
+    https address) in Vercel and redeploy. Until then the site says the live room isn't open.
 
 ## 1. What we are building
 
