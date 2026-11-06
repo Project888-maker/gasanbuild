@@ -141,27 +141,36 @@ export async function POST(request: Request) {
   };
 
   const stream = new ReadableStream<Uint8Array>({
+    // A pull that enqueues nothing is not called again, so it reads on until it
+    // has text to hand over or the answer has ended. (Chunks without text, like
+    // the opening role chunk and the closing cost chunk, used to stall the
+    // stream until the function timed out.)
     async pull(controller) {
-      const { done, value } = await reader.read();
-      if (done) return finish(controller);
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-      for (const line of lines) {
-        const data = line.startsWith("data:") ? line.slice(5).trim() : "";
-        if (data === "[DONE]") return finish(controller);
-        if (!data) continue;
-        try {
-          const chunk = JSON.parse(data);
-          if (chunk.usage) usage = chunk.usage;
-          const text: string | undefined = chunk.choices?.[0]?.delta?.content;
-          if (text) {
-            outChars += text.length;
-            controller.enqueue(encoder.encode(text));
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) return finish(controller);
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        let sent = false;
+        for (const line of lines) {
+          const data = line.startsWith("data:") ? line.slice(5).trim() : "";
+          if (data === "[DONE]") return finish(controller);
+          if (!data) continue;
+          try {
+            const chunk = JSON.parse(data);
+            if (chunk.usage) usage = chunk.usage;
+            const text: string | undefined = chunk.choices?.[0]?.delta?.content;
+            if (text) {
+              outChars += text.length;
+              controller.enqueue(encoder.encode(text));
+              sent = true;
+            }
+          } catch {
+            // keep-alive comments and partial lines
           }
-        } catch {
-          // keep-alive comments and partial lines
         }
+        if (sent) return;
       }
     },
     async cancel() {
