@@ -27,6 +27,13 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const id = typeof body?.invite === "string" && /^[0-9a-f-]{36}$/.test(body.invite) ? body.invite : "";
   const seconds = Math.max(0, Math.min(3 * 3600, Number(body?.seconds) || 0));
+  // What the call cost, by part, as Hermes's interview agent measured it (USD).
+  const raw = (body?.cost ?? null) as Record<string, unknown> | null;
+  const usd = (key: string) => Math.max(0, Math.min(1000, Number(raw?.[key]) || 0)).toFixed(2);
+  const cost = raw
+    ? `💷 This call: ~$${usd("total")} (${String(raw.brain || "?").slice(0, 20)}) · brain $${usd("brain")} · ` +
+      `voice $${usd("voice")} · avatar $${usd("avatar")} · transcription $${usd("transcription")}`
+    : "";
   const added = turns(body?.transcript);
   if (!id || !added.length) return Response.json({ error: "nothing to save" }, { status: 400 });
   const [guest] = await db`select name, company, role, topics, minutes from interview_requests where id = ${id}`;
@@ -72,6 +79,7 @@ export async function POST(request: Request) {
       const asked = added.filter((t) => t.role === "user").slice(0, 3).map((t) => `• ${t.content.slice(0, 160)}`);
       lines.push("(The automatic summary failed. What they asked first:)", ...asked);
     }
+    if (cost) lines.push("", cost);
     const link = adminUrl();
     await telegram(lines.join("\n").slice(0, 4000), link ? [[{ text: "Read the whole interview", url: link }]] : undefined);
   });
