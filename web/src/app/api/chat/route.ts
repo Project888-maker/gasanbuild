@@ -179,8 +179,9 @@ export async function POST(request: Request) {
           cost = chat_conversations.cost + excluded.cost,
           request = chat_conversations.request or excluded.request,
           ended = chat_conversations.ended or excluded.ended,
-          updated_at = now()
-        where chat_conversations.visitor = excluded.visitor`.catch((e) => console.error("chat save", e));
+          updated_at = now()`.catch((e) => console.error("chat save", e));
+      // The conversation id is a random UUID made in the visitor's tab: unguessable, so it's
+      // the key. (Matching the hashed IP too lost messages when a phone changed networks.)
     }
     // Jasmin ended the chat (repeated abuse or nonsense): no more messages today.
     if (full.includes("[[end]]")) {
