@@ -44,18 +44,39 @@ async function send(to: string, subject: string, html: string, text: string) {
   return true;
 }
 
-export async function sendReceived(to: string, name: string) {
+export async function sendReceived(to: string, name: string, kind: "interview" | "call" = "interview") {
+  const first = name.split(" ")[0];
+  const lines = kind === "call"
+    ? [
+        `Hi ${esc(first)},`,
+        "Thanks for the conversation. I've passed your request for a private call straight to Gasan, with the context you gave me.",
+        "He reads every request himself and will reply to you personally to arrange a time.",
+      ]
+    : [
+        `Hi ${esc(first)},`,
+        "Thank you for your interest in Gasan's work. I've passed your interview request to him, and he reviews every request personally.",
+        "If it's approved, I'll email you a private link to your live video interview with me. Until then, you're welcome to explore the projects or chat with me on the site.",
+      ];
+  return send(
+    to,
+    kind === "call" ? "Your request for a call with Gasan" : "I've received your request · Gasan builds AI",
+    layout(lines, { label: "Explore the work", url: `${site()}/work` }),
+    `Hi ${first},\n\n${lines.slice(1).join("\n\n")}\n\n${site()}/work\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
+  );
+}
+
+export async function sendCallAccepted(to: string, name: string, preferred: string) {
   const first = name.split(" ")[0];
   const lines = [
     `Hi ${esc(first)},`,
-    "Thank you for your interest in Gasan's work. I've passed your interview request to him, and he reviews every request personally.",
-    "If it's approved, I'll email you a private link to your live video interview with me. Until then, you're welcome to explore the projects or chat with me on the site.",
+    `Good news: Gasan has accepted your request for a private call${preferred ? ` (you suggested: ${esc(preferred)})` : ""}.`,
+    "He'll email you personally from his own address to confirm the time and how you'll connect. You can also simply reply to this email.",
   ];
   return send(
     to,
-    "I've received your request · Gasan builds AI",
-    layout(lines, { label: "Explore the work", url: `${site()}/work` }),
-    `Hi ${first},\n\n${lines.slice(1).join("\n\n")}\n\n${site()}/work\n\nJasmin, AI Chief of Staff to Gasan\n(I'm an AI. Reply to this email to reach Gasan directly.)`,
+    "Gasan accepted your call request",
+    layout(lines),
+    `Hi ${first},\n\nGasan has accepted your request for a private call${preferred ? ` (you suggested: ${preferred})` : ""}. He'll email you personally to confirm the time. You can also reply to this email.\n\nJasmin, AI Chief of Staff to Gasan`,
   );
 }
 

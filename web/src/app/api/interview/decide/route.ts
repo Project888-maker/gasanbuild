@@ -2,7 +2,7 @@
 
 import { sql } from "@/lib/db";
 import { inviteUrl, telegram, verify } from "@/lib/decisions";
-import { mailConfigured, sendApproved } from "@/lib/mail";
+import { mailConfigured, sendApproved, sendCallAccepted } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
@@ -25,12 +25,26 @@ export async function GET(request: Request) {
     update interview_requests
     set status = ${status}, minutes = ${decision.action === "approve" ? decision.minutes : null}, decided_at = now()
     where id = ${decision.id} and status = 'pending'
-    returning name, email, company, preferred`;
+    returning name, email, company, preferred, kind`;
   if (!rows.length) {
     const [row] = await sql`select status, minutes from interview_requests where id = ${decision.id}`;
     return page("Already decided", row ? `This request is already <span>${esc(String(row.status))}</span>.` : "Request not found.");
   }
   const who = `${rows[0].name}${rows[0].company ? ` (${rows[0].company})` : ""}`;
+  if (decision.action === "approve" && rows[0].kind === "call") {
+    const emailed = mailConfigured()
+      ? await sendCallAccepted(String(rows[0].email), String(rows[0].name), String(rows[0].preferred || "")).catch((e) => {
+          console.error("mail call", e);
+          return false;
+        })
+      : false;
+    await telegram(
+      `✅ Call accepted: ${who} · ${rows[0].email}\n` +
+        (emailed ? "📧 They've been told you'll email them to fix a time." : "⚠️ No email sent (email not set up). Write to them directly.") +
+        (rows[0].preferred ? `\nThey suggested: ${rows[0].preferred}` : ""),
+    );
+    return page("Call accepted", `Reply to <span>${esc(String(rows[0].email))}</span> to fix a time with <span>${esc(who)}</span>.`);
+  }
   if (decision.action === "approve") {
     const invite = inviteUrl(decision.id, decision.minutes);
     let emailed = false;

@@ -8,6 +8,41 @@ import { JASMIN } from "@/content/jasmin";
 import { runAction, clearHighlight } from "@/lib/stage";
 import { scrollToTarget } from "@/components/Motion";
 import type { JasminRequest } from "@/lib/jasmin-events";
+import RequestCard, { type Prepared } from "@/components/RequestCard";
+
+// Jasmin's replies can carry UI actions in [[...]]: a prepared request card, or [[end]].
+function visibleText(content: string) {
+  return content.replace(/\[\[[\s\S]*?\]\]/g, "").replace(/\[\[[\s\S]*$/, "").trim();
+}
+
+// Project paths and web links in her replies become links.
+function Linked({ text }: { text: string }) {
+  const parts = text.split(/(\/work\/[a-z0-9-]+|https?:\/\/[^\s)]+)/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^\/work\//.test(part) ? (
+          <a key={i} href={part} className="text-gold underline underline-offset-2">{part}</a>
+        ) : /^https?:\/\//.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noreferrer" className="text-gold underline underline-offset-2">{part.replace(/^https?:\/\//, "")}</a>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+function preparedRequest(content: string): Prepared | null {
+  const match = content.match(/\[\[request\s*(\{[\s\S]*?\})\s*\]\]/);
+  if (!match) return null;
+  try {
+    const data = JSON.parse(match[1]);
+    return { ...data, kind: data.kind === "interview" ? "interview" : "call" };
+  } catch {
+    return null;
+  }
+}
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -38,6 +73,7 @@ export default function JasminDock() {
   const [mode, setMode] = useState<"closed" | "chat" | "tour">("closed");
   const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: JASMIN.greeting }]);
   const [input, setInput] = useState("");
+  const ended = messages.some((m) => m.role === "assistant" && m.content.includes("[[end]]"));
   const [busy, setBusy] = useState(false);
   const [step, setStep] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -50,7 +86,7 @@ export default function JasminDock() {
   const send = useCallback(
     async (text: string) => {
       const question = text.trim().slice(0, 1200);
-      if (!question || busy) return;
+      if (!question || busy || ended) return;
       const history: Message[] = [...messages, { role: "user", content: question }];
       setMessages([...history, { role: "assistant", content: "" }]);
       setInput("");
@@ -81,7 +117,7 @@ export default function JasminDock() {
         setBusy(false);
       }
     },
-    [busy, messages],
+    [busy, messages, ended],
   );
 
   // Buttons elsewhere on the site open the chat or start the tour.
@@ -226,17 +262,25 @@ export default function JasminDock() {
           <button onClick={() => setMode("closed")} className="rounded-full p-2 text-muted hover:text-text" aria-label="Close chat">✕</button>
         </header>
         <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto p-4" data-lenis-prevent>
-          {messages.map((m, i) => (
-            <div key={i} className={m.role === "user" ? "flex justify-end" : "flex"}>
-              <p
-                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-[0.92rem] leading-relaxed ${
-                  m.role === "user" ? "bg-gold text-ink" : "bg-ink-3 text-text"
-                }`}
-              >
-                {m.content || <span className="inline-flex gap-1"><span className="animate-pulse">•</span><span className="animate-pulse [animation-delay:150ms]">•</span><span className="animate-pulse [animation-delay:300ms]">•</span></span>}
-              </p>
-            </div>
-          ))}
+          {messages.map((m, i) => {
+            const text = m.role === "assistant" ? visibleText(m.content) : m.content;
+            const card = m.role === "assistant" && !(busy && i === messages.length - 1) ? preparedRequest(m.content) : null;
+            return (
+              <div key={i} className="space-y-2">
+                <div className={m.role === "user" ? "flex justify-end" : "flex"}>
+                  <p
+                    className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-[0.92rem] leading-relaxed ${
+                      m.role === "user" ? "bg-gold text-ink" : "bg-ink-3 text-text"
+                    }`}
+                  >
+                    {text ? (m.role === "assistant" ? <Linked text={text} /> : text) : <span className="inline-flex gap-1"><span className="animate-pulse">•</span><span className="animate-pulse [animation-delay:150ms]">•</span><span className="animate-pulse [animation-delay:300ms]">•</span></span>}
+                  </p>
+                </div>
+                {card && <div className="max-w-[90%]"><RequestCard prepared={card} /></div>}
+              </div>
+            );
+          })}
+          {ended && <p className="text-center font-mono text-[0.65rem] tracking-[0.2em] text-muted">JASMIN CLOSED THIS CHAT</p>}
           {messages.length === 1 && (
             <div className="flex flex-wrap gap-2 pt-1">
               {SUGGESTIONS.map((s) => (
@@ -255,11 +299,12 @@ export default function JasminDock() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about any project…"
+            disabled={ended}
+            placeholder={ended ? "This chat has ended" : "Ask about any project…"}
             maxLength={1200}
             className="min-w-0 flex-1 rounded-full border border-line bg-ink-2 px-4 py-2.5 text-sm outline-none placeholder:text-muted focus:border-gold"
           />
-          <button disabled={busy || !input.trim()} className="btn btn-gold !px-4 !py-2 disabled:opacity-40">Send</button>
+          <button disabled={busy || ended || !input.trim()} className="btn btn-gold !px-4 !py-2 disabled:opacity-40">Send</button>
         </form>
       </aside>
     );

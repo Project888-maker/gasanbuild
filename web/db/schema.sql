@@ -29,3 +29,9 @@ create table if not exists interview_requests (
 );
 
 create index if not exists interview_requests_visitor_day on interview_requests (visitor, created_at);
+
+-- 2026-11-06: calls with Gasan himself, and Jasmin's note on each request.
+alter table interview_requests
+  add column if not exists kind text not null default 'interview' check (kind in ('interview', 'call')),
+  add column if not exists note text not null default '',
+  add column if not exists source text not null default 'form';

@@ -3,3 +3,4 @@ media/run.log
 __pycache__/
 media/src/jasmin_ref*
 media/run*.log
+eval/run-*.log

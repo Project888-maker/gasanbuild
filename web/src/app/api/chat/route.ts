@@ -19,9 +19,24 @@ const num = (name: string, fallback: number) => {
 
 const CAP = () => num("CHAT_DAILY_CAP_USD", 1);
 const VISITOR_LIMIT = () => num("CHAT_VISITOR_LIMIT", 20);
-const PRICE_IN = () => num("CHAT_PRICE_IN", 0.3);
-const PRICE_OUT = () => num("CHAT_PRICE_OUT", 2.5);
-const MAX_OUT = 450;
+// Jasmin's model is chosen by the conversation tests in eval/ (see eval/README.md).
+// JASMIN_MODEL overrides it without a code change.
+// Sonnet 5.5 won the 2026-11-06 tests (eval/results): most human and best at boundaries.
+const DEFAULT_MODEL = "anthropic/claude-sonnet-5.5";
+const MODEL = () => process.env.JASMIN_MODEL || DEFAULT_MODEL;
+// USD per million tokens, for the reservation made before each answer. The real
+// cost reported by the endpoint replaces the reservation afterwards.
+const PRICES: Record<string, [number, number]> = {
+  "google/gemini-2.5-flash": [0.3, 2.5],
+  "anthropic/claude-haiku-5.5": [1, 5],
+  "anthropic/claude-sonnet-5.5": [3, 15],
+  "anthropic/claude-opus-5.5": [6, 30],
+};
+const PRICE_IN = () => (PRICES[MODEL()] ?? [3, 15])[0];
+const PRICE_OUT = () => (PRICES[MODEL()] ?? [3, 15])[1];
+// Chat answers don't need long silent thinking; Sonnet can't turn it off, so it gets the lowest effort.
+const REASONING = () => (/sonnet|opus/.test(MODEL()) ? { effort: "low" } : { enabled: false });
+const MAX_OUT = 1000;
 // Default: Gemini Flash through fal's OpenRouter route, billed to the fal account,
 // which reports the exact cost of every answer.
 const BASE_URL = () => (process.env.CHAT_BASE_URL || "https://fal.run/openrouter/router/openai/v1").replace(/\/$/, "");
@@ -94,13 +109,21 @@ export async function POST(request: Request) {
         "X-Title": "GasanbuildsAI - Jasmin",
       },
       body: JSON.stringify({
-        model: process.env.CHAT_MODEL || "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: system }, ...messages],
+        model: MODEL(),
+        // Every visitor gets the same system prompt, so Claude models cache it:
+        // repeat turns cost about a tenth.
+        messages: [
+          MODEL().startsWith("anthropic/")
+            ? { role: "system", content: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }] }
+            : { role: "system", content: system },
+          ...messages,
+        ],
         max_tokens: MAX_OUT,
         temperature: 0.5,
         stream: true,
         stream_options: { include_usage: true },
         usage: { include: true },
+        reasoning: REASONING(),
       }),
       signal: AbortSignal.timeout(45_000),
     });
@@ -120,6 +143,7 @@ export async function POST(request: Request) {
   let buffer = "";
   let usage: { prompt_tokens?: number; completion_tokens?: number; cost?: number } | null = null;
   let outChars = 0;
+  let full = "";
 
   // fal's route keeps the connection open after "[DONE]", so the answer ends at
   // "[DONE]" (or when the connection closes), not when the socket does: waiting
@@ -136,6 +160,11 @@ export async function POST(request: Request) {
           ? cost(usage.prompt_tokens, usage.completion_tokens ?? 0)
           : cost(Math.ceil(chars / 3.2), Math.ceil(outChars / 3.2));
     await settle(actual).catch((e) => console.error("chat settle", e));
+    // Jasmin ended the chat (repeated abuse or nonsense): no more messages today.
+    if (full.includes("[[end]]")) {
+      await db`update chat_visitors set messages = greatest(messages, ${VISITOR_LIMIT() + 1})
+               where day = ${day} and visitor = ${visitor}`.catch((e) => console.error("chat end", e));
+    }
     controller.close();
     reader.cancel().catch(() => {});
   };
@@ -163,6 +192,7 @@ export async function POST(request: Request) {
             const text: string | undefined = chunk.choices?.[0]?.delta?.content;
             if (text) {
               outChars += text.length;
+              full += text;
               controller.enqueue(encoder.encode(text));
               sent = true;
             }
