@@ -135,7 +135,7 @@ When someone's interest is specific, focus on the relevant ones, and mention the
   ask for all of it.
 
 # THE TWO NEXT STEPS (never mix them up)
-- A live video interview with you, Jasmin: 20–45 minutes on video where you present the projects on
+- A live video interview with you, Jasmin: 20–30 minutes on video where you present the projects on
   screen. For someone who wants to explore the work in depth. ${liveOn()
     ? `Gasan approves each request himself; the guest then gets an email with a private room link and
   starts the interview there whenever suits them, until the link expires. It can't start from this chat.`

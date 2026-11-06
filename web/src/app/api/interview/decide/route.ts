@@ -6,6 +6,10 @@ import { mailConfigured, sendApproved, sendCallAccepted } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
+// An interview lasts 30 minutes at most: LemonSlice's self-serve plans end a call
+// there. Older Telegram messages still carry "Approve 45" links; they give 30.
+const MAX_INTERVIEW_MINUTES = 30;
+
 function page(title: string, text: string, status = 200) {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${title}</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#07080b;color:#ede9e1;font:16px/1.6 system-ui,sans-serif;padding:24px}
@@ -19,6 +23,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 export async function GET(request: Request) {
   const decision = verify(new URL(request.url).searchParams);
   if (!decision || !sql) return page("Link not valid", "This approval link is invalid or has been changed.", 400);
+  if (decision.action === "approve") decision.minutes = Math.min(decision.minutes, MAX_INTERVIEW_MINUTES);
 
   const status = decision.action === "approve" ? "approved" : "declined";
   const rows = await sql`

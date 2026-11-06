@@ -145,7 +145,7 @@ read from the repo; numbers marked (check) still need confirming.
 Guest fills the form on /jasmin  (name, company, role, email, topics, preferred time; Turnstile)
         │
         ▼
-Request saved (Postgres) ──► Telegram to Gasan: [Approve 20 min] [Approve 45 min] [Decline]
+Request saved (Postgres) ──► Telegram to Gasan: [Approve 20 min] [Approve 30 min] [Decline]
         │                                     (+ /admin page as backup)
         ▼ approve
 Signed one-time link (HMAC, bound to the guest, valid for a time window, minute cap)

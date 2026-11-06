@@ -37,10 +37,11 @@ async function notify(r: Request_, id: string, kind: Kind, note: string, source:
     const yes = link("approve", 30);
     buttons = yes && no ? [[{ text: "✅ Accept call", url: yes }, { text: "✖ Decline", url: no }]] : undefined;
   } else {
+    // 30 at most: LemonSlice's self-serve plans end a call after 30 minutes.
     const a20 = link("approve", 20);
-    const a45 = link("approve", 45);
-    buttons = a20 && a45 && no
-      ? [[{ text: "✅ Approve 20 min", url: a20 }, { text: "✅ Approve 45 min", url: a45 }], [{ text: "✖ Decline", url: no }]]
+    const a30 = link("approve", 30);
+    buttons = a20 && a30 && no
+      ? [[{ text: "✅ Approve 20 min", url: a20 }, { text: "✅ Approve 30 min", url: a30 }], [{ text: "✖ Decline", url: no }]]
       : undefined;
   }
   await telegram(lines.join("\n"), buttons);
