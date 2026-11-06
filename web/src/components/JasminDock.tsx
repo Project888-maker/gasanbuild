@@ -138,7 +138,7 @@ export default function JasminDock() {
     return (
       <aside
         aria-live="polite"
-        className="glass fixed bottom-4 left-4 right-4 z-[70] overflow-hidden rounded-2xl shadow-2xl shadow-black/60 sm:right-auto sm:w-[380px]"
+        className="glass fixed bottom-4 left-4 right-4 z-[70] overflow-hidden rounded-2xl shadow-2xl shadow-black/60 sm:left-auto sm:right-5 sm:w-[380px]"
       >
         <div className="relative aspect-video">
           <Portrait />

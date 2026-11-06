@@ -1,6 +1,33 @@
 # gasanbuild: portfolio + Jasmin, plan for review
 
-Status: **draft for Gasan's review**. Nothing is built yet.
+Status: **approved 2026-11-05; phases 0–1 built.**
+
+## Decisions (Gasan, 2026-11-05)
+
+| Question | Decision |
+|---|---|
+| Public chat | Yes: a live text chat for everyone, hard cap **$1/day** for the whole site (20 messages per visitor per day) |
+| Approvals | Telegram buttons through Hermes, plus an admin page as backup |
+| Jasmin's title | **AI Chief of Staff** |
+| Site | Vercel project **gasanbuildsai** (root directory `web/`) |
+| Live Jasmin | Her own service on Gasan's server, next to Hermes |
+| First full chapter | Hermes + Jasmin |
+| Dentalscaner | Free for patients; the old 15% deposit model must not appear anywhere |
+
+## Progress
+
+- Done: project dossiers (`web/src/content/projects.ts`), Jasmin's work persona and a
+  draft "about Gasan" (`web/src/content/jasmin.ts`, **needs Gasan's approval**), site with
+  home, `/work`, all ten chapters (Hermes fully finished), `/jasmin` with the interview form,
+  guided tour on the Stage engine, chat API with the daily cap, Neon database
+  (`gasanbuildsai`, London region), first films and posters on fal (`media/`).
+- Chat runs on Gemini Flash through fal's OpenRouter route, billed to the fal account,
+  about $0.002 per answer.
+- Jasmin's office look is a preview made from a screenshot; remake it from her real
+  reference portrait.
+- Next: Gasan creates the Vercel project (the connector cannot), adds the env vars; then
+  voice-overs in her voice, demo recordings, title films for the other nine, Telegram
+  approval flow in Hermes, then the live presenter.
 
 ## 1. What we are building
 

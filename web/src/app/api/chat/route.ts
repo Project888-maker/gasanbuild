@@ -22,6 +22,9 @@ const VISITOR_LIMIT = () => num("CHAT_VISITOR_LIMIT", 20);
 const PRICE_IN = () => num("CHAT_PRICE_IN", 0.3);
 const PRICE_OUT = () => num("CHAT_PRICE_OUT", 2.5);
 const MAX_OUT = 450;
+// Default: Gemini Flash through fal's OpenRouter route, billed to the fal account,
+// which reports the exact cost of every answer.
+const BASE_URL = () => (process.env.CHAT_BASE_URL || "https://fal.run/openrouter/router/openai/v1").replace(/\/$/, "");
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -81,10 +84,11 @@ export async function POST(request: Request) {
 
   let upstream: Response;
   try {
-    upstream = await fetch(`${process.env.CHAT_BASE_URL || "https://openrouter.ai/api/v1"}/chat/completions`, {
+    upstream = await fetch(`${BASE_URL()}/chat/completions`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${key}`,
+        // fal's OpenRouter route wants "Key <fal key>"; other endpoints use Bearer.
+        Authorization: `${BASE_URL().includes("fal.run") ? "Key" : "Bearer"} ${key}`,
         "Content-Type": "application/json",
         "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://gasanbuildsai.vercel.app",
         "X-Title": "GasanbuildsAI - Jasmin",
