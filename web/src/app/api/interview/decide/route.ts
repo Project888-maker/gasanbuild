@@ -1,7 +1,8 @@
 // Gasan taps Approve or Decline in Telegram; the signed link lands here.
 
 import { sql } from "@/lib/db";
-import { telegram, verify } from "@/lib/decisions";
+import { inviteUrl, telegram, verify } from "@/lib/decisions";
+import { mailConfigured, sendApproved } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
@@ -24,15 +25,32 @@ export async function GET(request: Request) {
     update interview_requests
     set status = ${status}, minutes = ${decision.action === "approve" ? decision.minutes : null}, decided_at = now()
     where id = ${decision.id} and status = 'pending'
-    returning name, email, company`;
+    returning name, email, company, preferred`;
   if (!rows.length) {
     const [row] = await sql`select status, minutes from interview_requests where id = ${decision.id}`;
     return page("Already decided", row ? `This request is already <span>${esc(String(row.status))}</span>.` : "Request not found.");
   }
   const who = `${rows[0].name}${rows[0].company ? ` (${rows[0].company})` : ""}`;
   if (decision.action === "approve") {
-    await telegram(`✅ Approved ${decision.minutes} min for ${who} · ${rows[0].email}`);
-    return page("Approved", `<span>${esc(who)}</span> is approved for a ${decision.minutes}-minute interview with Jasmin. They will get their private link by email once live calls open.`);
+    const invite = inviteUrl(decision.id, decision.minutes);
+    let emailed = false;
+    if (invite && mailConfigured()) {
+      emailed = await sendApproved(String(rows[0].email), String(rows[0].name), decision.minutes, invite.url, String(rows[0].preferred || ""), invite.expires)
+        .catch((e) => {
+          console.error("mail approved", e);
+          return false;
+        });
+    }
+    await telegram(
+      `✅ Approved ${decision.minutes} min for ${who} · ${rows[0].email}\n` +
+        (emailed ? "📧 Private room link emailed." : `⚠️ Email not sent${mailConfigured() ? " (send failed, see logs)" : " (email not set up)"}.`) +
+        (invite ? `\nRoom: ${invite.url}` : ""),
+    );
+    return page(
+      "Approved",
+      `<span>${esc(who)}</span> is approved for a ${decision.minutes}-minute interview with Jasmin. ` +
+        (emailed ? "Their private room link is on its way by email." : "Email isn't set up yet, so the room link was sent to you on Telegram to forward."),
+    );
   }
   await telegram(`✖ Declined: ${who}`);
   return page("Declined", `The request from <span>${esc(who)}</span> was declined.`);

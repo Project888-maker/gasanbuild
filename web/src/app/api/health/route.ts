@@ -24,6 +24,7 @@ export async function GET() {
       chat: Boolean(process.env.CHAT_API_KEY),
       telegram: Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID),
       approvals: Boolean(process.env.INTERVIEW_SECRET),
+      email: Boolean(process.env.SMTP_USER && process.env.SMTP_PASS),
       visitorSalt: Boolean(process.env.VISITOR_SALT),
       chatBudget: { capUsd: cap, spentTodayUsd: spentToday },
     },

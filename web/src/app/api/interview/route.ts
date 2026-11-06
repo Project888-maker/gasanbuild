@@ -3,6 +3,7 @@
 
 import { sql, today, visitorId } from "@/lib/db";
 import { decisionUrl, telegram, type Decision } from "@/lib/decisions";
+import { sendReceived } from "@/lib/mail";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,9 @@ export async function POST(request: Request) {
     insert into interview_requests (name, email, company, role, topics, preferred, visitor)
     values (${r.name}, ${r.email}, ${r.company}, ${r.role}, ${r.topics}, ${r.preferred}, ${visitor})
     returning id`;
-  await notify(r, String(row.id));
+  await Promise.all([
+    notify(r, String(row.id)),
+    sendReceived(r.email, r.name).catch((e) => console.error("mail received", e)),
+  ]);
   return Response.json({ ok: true });
 }

@@ -48,3 +48,33 @@ export async function telegram(text: string, buttons?: { text: string; url: stri
     signal: AbortSignal.timeout(8000),
   }).catch((e) => console.error("telegram", e));
 }
+
+// The guest's private room link: request id, approved minutes and expiry, signed.
+export type Invite = { id: string; minutes: number; expires: number };
+
+export const INVITE_DAYS = 14;
+
+export function inviteUrl(id: string, minutes: number): { url: string; expires: Date } | null {
+  if (!secret()) return null;
+  const expires = Date.now() + INVITE_DAYS * 86_400_000;
+  const payload = Buffer.from(JSON.stringify({ i: id, m: minutes, e: expires })).toString("base64url");
+  const sig = createHmac("sha256", secret()).update(`invite|${payload}`).digest("base64url");
+  const base = (process.env.NEXT_PUBLIC_SITE_URL || "https://gasanbuildsai.vercel.app").replace(/\/$/, "");
+  return { url: `${base}/interview/${payload}.${sig}`, expires: new Date(expires) };
+}
+
+export function readInvite(token: string): Invite | null {
+  if (!secret()) return null;
+  const [payload, sig] = decodeURIComponent(token).split(".");
+  if (!payload || !sig) return null;
+  const expected = Buffer.from(createHmac("sha256", secret()).update(`invite|${payload}`).digest("base64url"));
+  const given = Buffer.from(sig);
+  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (typeof data.i !== "string" || typeof data.m !== "number" || typeof data.e !== "number") return null;
+    return data.e > Date.now() ? { id: data.i, minutes: data.m, expires: data.e } : null;
+  } catch {
+    return null;
+  }
+}

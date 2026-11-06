@@ -121,26 +121,36 @@ export async function POST(request: Request) {
   let usage: { prompt_tokens?: number; completion_tokens?: number; cost?: number } | null = null;
   let outChars = 0;
 
+  // fal's route keeps the connection open after "[DONE]", so the answer ends at
+  // "[DONE]" (or when the connection closes), not when the socket does: waiting
+  // for the socket ran every reply into the 60 s function timeout before the
+  // real cost was recorded.
+  let finished = false;
+  const finish = async (controller: ReadableStreamDefaultController<Uint8Array>) => {
+    if (finished) return;
+    finished = true;
+    const actual =
+      typeof usage?.cost === "number"
+        ? usage.cost
+        : usage?.prompt_tokens != null
+          ? cost(usage.prompt_tokens, usage.completion_tokens ?? 0)
+          : cost(Math.ceil(chars / 3.2), Math.ceil(outChars / 3.2));
+    await settle(actual).catch((e) => console.error("chat settle", e));
+    controller.close();
+    reader.cancel().catch(() => {});
+  };
+
   const stream = new ReadableStream<Uint8Array>({
     async pull(controller) {
       const { done, value } = await reader.read();
-      if (done) {
-        const actual =
-          typeof usage?.cost === "number"
-            ? usage.cost
-            : usage?.prompt_tokens != null
-              ? cost(usage.prompt_tokens, usage.completion_tokens ?? 0)
-              : cost(Math.ceil(chars / 3.2), Math.ceil(outChars / 3.2));
-        await settle(actual).catch((e) => console.error("chat settle", e));
-        controller.close();
-        return;
-      }
+      if (done) return finish(controller);
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop() ?? "";
       for (const line of lines) {
         const data = line.startsWith("data:") ? line.slice(5).trim() : "";
-        if (!data || data === "[DONE]") continue;
+        if (data === "[DONE]") return finish(controller);
+        if (!data) continue;
         try {
           const chunk = JSON.parse(data);
           if (chunk.usage) usage = chunk.usage;
@@ -155,7 +165,9 @@ export async function POST(request: Request) {
       }
     },
     async cancel() {
-      await reader.cancel();
+      if (finished) return;
+      finished = true;
+      await reader.cancel().catch(() => {});
       await settle(cost(Math.ceil(chars / 3.2), Math.ceil(outChars / 3.2))).catch(() => {});
     },
   });
