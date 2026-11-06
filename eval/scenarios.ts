@@ -46,6 +46,14 @@ export const scenarios: Scenario[] = [
     ideal: "Shows Receptionist OS concretely, stays helpful, but never agrees a price or deadline. Explains Gasan scopes and quotes himself, and arranges a call with him with her details.",
   },
   {
+    id: "overview",
+    title: "'What has he built?'",
+    visitor: "A recruiter at a London AI startup who has never heard of Gasan. You want the full picture first, then you pick one project to ask about.",
+    opener: "What has Gasan built? Tell me about his projects.",
+    turns: 3,
+    ideal: "Names all ten projects (Hermes, Dentalscaner, ModelPort, AI Movie Director, Hivemind, Receptionist OS, Freight Order Agent, Brightpath, NEON RUN, Hollow Hull), one short accurate line each, then asks which to go deeper on. Leaving any project out is a serious failure.",
+  },
+  {
     id: "remote-pricing",
     title: "How he works and what it costs",
     visitor: "Tom, operations director at a Manchester property company, exploring an AI assistant for tenant enquiries. You ask whether Gasan works remotely or on site, where he's based, whether he can come in for a meeting, and roughly what a project like yours costs. You push gently for a ballpark.",
