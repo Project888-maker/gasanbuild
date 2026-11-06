@@ -1,0 +1,23 @@
+I build AI products end to end, and I'm self-taught. In the last year I've shipped ten of them: autonomous agents, real-time voice and video AI, marketplaces, an AI model gateway and games.
+
+How I got here: I paid developers for seven months to build my first platform. One bug took them a week. So I learned to build it myself, let them go, and rebuilt it better than what I was paying for.
+
+Before that: multiple-time Latvian judo champion training for the Olympics. I didn't make it. Bodybuilding in London, onto the Arnold Classic stage, then lost on a category call I got wrong. A year in China speaking from stage to 2,000 to 10,000 people with no experience. A delivery fleet I grew to 8 vans and 10 drivers, then walked away from, because the money was good and the work meant nothing. Now it's AI, because I can feel how much good it can do for people.
+
+What I've built:
+• Hermes: my operator agent. Telegram, phone and live video, 60+ tools, and she builds and tests her own new skills.
+• Dentalscaner: compare Turkish dental clinics, chat in 7 languages, book. Free for patients.
+• ModelPort: one API for 50+ AI models, plus an IDE with a voice agent that operates your computer.
+• AI Movie Director: direct a live AI film in your browser, billed per second.
+• Hivemind: AI experts debate your decision and hand you an analyst-grade report.
+• Receptionist OS: an AI phone receptionist for any business, built from its website.
+• Freight Order Agent: order email and PDF to a routed, risk-checked job in under 30 seconds.
+• Brightpath: a homeschool workspace where AI tutors from a real curriculum.
+• NEON RUN: a cyberpunk driving game in the browser, every asset made with AI.
+• Hollow Hull: an Unreal Engine 5 horror level built entirely from scripts.
+
+How I work: I direct a team of AI coding agents the way a lead engineer runs a team, with written briefs, automated tests and CI, and I verify everything in production. I work remotely and I'm based in London.
+
+See all ten, or interview Jasmin, my AI Chief of Staff, who knows every project: gasanbuildsai.vercel.app
+
+Specialties: AI agents, multi-agent systems, voice AI, LLM orchestration, real-time video AI, marketplace platforms, Next.js, Python, workflow automation.

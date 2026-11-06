@@ -1,0 +1,9 @@
+A year ago I paid developers for seven months to build one platform.
+
+This year I shipped ten AI products myself.
+
+An operator agent that builds and tests her own new skills. A gateway to 50+ AI models with an IDE you talk to. A live AI cinema billed per second. A room of AI experts that argues out your decisions. An AI phone receptionist built from a website. A freight agent piloted with a real dispatcher. And a couple of games, because why not.
+
+I put all ten in one place. You can browse it, or interview Jasmin, my AI Chief of Staff. She knows every project and she'll tell you honestly what's live and what's still in testing.
+
+Link in the first comment. Tell me which one you'd want to see built for your business.

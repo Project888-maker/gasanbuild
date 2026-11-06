@@ -1,0 +1,11 @@
+I design and ship AI products end to end, from the business flow and architecture to production. Ten products in the last year, with a team of AI coding agents I direct like a lead engineer: written briefs, automated tests, CI, and verification in production.
+
+• Hermes: personal operator agent (Telegram, phone, live video, 60+ tools) that researches, builds, tests and deploys its own new skills, with automatic rollback.
+• ModelPort: OpenAI-compatible gateway to 50+ models, a creative Studio, a terminal coding agent, and a desktop IDE whose voice agent operates the computer.
+• AI Movie Director: live AI cinema over WebRTC with per-second billing and an AI Director agent.
+• Hivemind: multi-agent decision intelligence with evidence scoring and PDF reports.
+• Receptionist OS: multi-tenant AI phone receptionist built from a business's website.
+• Freight Order Agent: email and PDF transport orders to routed, risk-checked jobs, piloted with a real operator.
+• Brightpath, NEON RUN, Hollow Hull: education, browser game and Unreal Engine 5 work.
+
+Portfolio: gasanbuildsai.vercel.app

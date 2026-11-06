@@ -1,0 +1,3 @@
+A marketplace connecting UK patients with dental clinics in Turkey: compare clinics and prices, chat directly with every message translated both ways (7 languages), and book. Free for patients. Started with outsourced developers, then rebuilt from scratch myself. Flew to Turkey for a month to meet and pitch clinics in person.
+
+dentalscaner.co.uk

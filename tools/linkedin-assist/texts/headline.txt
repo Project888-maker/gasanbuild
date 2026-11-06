@@ -1,0 +1,1 @@
+Give me a business problem and I'll map the flow, pick the stack and build it with AI | AI agents, voice AI, platforms | 10 products shipped | Portfolio: gasanbuildsai.vercel.app

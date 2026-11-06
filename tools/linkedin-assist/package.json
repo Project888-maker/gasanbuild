@@ -1,0 +1,12 @@
+{
+  "name": "linkedin-assist",
+  "private": true,
+  "type": "module",
+  "description": "Human-in-the-loop helper: Claude fills LinkedIn forms in a browser on Gasan's computer; Gasan logs in and clicks Save himself.",
+  "scripts": {
+    "start": "node start-browser.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  }
+}
