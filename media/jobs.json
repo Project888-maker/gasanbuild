@@ -1,0 +1,49 @@
+[
+  {
+    "id": "opening",
+    "image_prompt": "Cinematic wide shot at blue hour from inside the top floor of a modern glass skyscraper, looking out over a vast city skyline glowing with millions of lights, low clouds drifting between the towers, warm gold reflections from the interior on the glass, deep navy and amber palette, anamorphic lens, subtle film grain, ultra realistic photograph, no people, no text, no logos.",
+    "video_prompt": "Very slow cinematic push-in towards the window. Clouds drift between the towers, city lights twinkle, soft reflections move on the glass. Smooth, calm, one continuous shot, no cuts, no text.",
+    "seconds": 10
+  },
+  {
+    "id": "jasmin-office",
+    "reference": "src/jasmin_ref_from_screenshot.jpg",
+    "image_prompt": "Keep the adult woman from the reference image exactly the same person: same face, facial features, long dark curly hair, brown eyes and skin tone. New photo of her: she sits at a sleek walnut desk in a corner office on a high floor of a modern skyscraper at dusk, wearing a tailored black blazer over an ivory silk blouse, small gold earrings, hair neat and glossy. Floor-to-ceiling windows behind her show a glittering city skyline at blue hour. Webcam framing of a professional video call: waist up, centred, facing the camera, looking straight into the lens with a warm, confident, professional smile, mouth closed. Soft warm key light on her face, realistic skin texture, photorealistic, the photo fills the whole frame, no text, no logos, no laptop in front of her.",
+    "video_prompt": "Static webcam shot of a professional video call, the camera never moves. She listens attentively with a warm, confident smile: small nods, natural blinking and breathing, a slight head tilt. Her mouth stays closed, she is not talking. City lights twinkle softly behind her. Natural, realistic, subtle.",
+    "seconds": 10
+  },
+  {
+    "id": "hermes",
+    "image_prompt": "A dark, elegant command room at night. In the centre floats a softly glowing golden sphere of light; fine luminous gold threads stream out from it to floating translucent holograms of a phone handset, an envelope, a calendar page, a film strip, a paintbrush and a browser window, all slowly orbiting the sphere. Obsidian black and warm gold palette, volumetric haze, cinematic lighting, shallow depth of field, ultra detailed, no text, no letters, no logos, no people.",
+    "video_prompt": "The golden core pulses gently like a heartbeat, streams of light flow outward along the threads to the holograms, which drift slowly around it while the camera slowly orbits. Smooth cinematic motion, one continuous shot, no cuts, no text.",
+    "seconds": 10
+  },
+  {
+    "id": "dentalscaner",
+    "image_prompt": "Golden hour over Istanbul seen from the window of a bright, premium, modern dental clinic lounge: white and soft teal interior, an elegant modern dental chair, a view of the Bosphorus and the city skyline in warm light, calm, clean and trustworthy, architectural interior photography, no people, no text, no logos."
+  },
+  {
+    "id": "modelport",
+    "image_prompt": "A futuristic harbour at night: hundreds of streams of coloured light flow in across the dark sea and converge into one monumental glowing gateway arch, reflections on wet stone, deep violet and electric blue palette, cinematic wide shot, epic scale, no text, no letters, no logos."
+  },
+  {
+    "id": "moviedirector",
+    "image_prompt": "An empty film studio at night: a lone director's chair faces a giant glowing screen that shows a living, dreamlike landscape whose light spills out into the room, volumetric haze, film noir lighting with crimson and amber accents, cinematic wide shot, no people, no text, no letters, no logos."
+  },
+  {
+    "id": "hivemind",
+    "image_prompt": "A circular dark chamber where eight translucent glass human figures sit around a round table, beams of light pass between them like arguments in a debate, a glowing hexagonal core floats above the table, cool cyan and white palette, cinematic, atmospheric, no text, no letters, no logos."
+  },
+  {
+    "id": "receptionist",
+    "image_prompt": "A sleek modern reception desk in a stylish small business at night, an elegant soft-glowing ribbon of sound waveform floats in the air above a minimal desk phone, warm amber and emerald accents, shallow depth of field, cinematic, no people, no text, no letters, no logos."
+  },
+  {
+    "id": "freight",
+    "image_prompt": "A modern European articulated truck with a plain unbranded trailer drives along a coastal highway at blue hour, a lit ferry waits in the harbour below, glowing route lines and waypoint markers are drawn over the landscape like a holographic map, cinematic aerial shot, no text, no letters, no logos."
+  },
+  {
+    "id": "brightpath",
+    "image_prompt": "A calm sunlit home study corner in the morning: a wooden desk with open books, a notebook, a tablet and a small plant, soft warm light through linen curtains, gentle pastel tones, peaceful and focused, editorial interior photography, no people, no text, no letters, no logos."
+  }
+]
