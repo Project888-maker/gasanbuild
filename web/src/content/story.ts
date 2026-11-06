@@ -37,7 +37,7 @@ export const chapters: Chapter[] = [
   {
     place: "Now",
     title: "Learning to build",
-    text: "I paid outsourced developers for seven months. One bug took them a week. So I learned to build, let them go and rebuilt Dentalscaner myself, better. Then came Hermes, Hivemind, Receptionist OS and the rest.",
+    text: "I paid outsourced developers for seven months. One bug took them a week. So I learned to build, let them go and rebuilt Dentalscaner myself, better. Then came Hermes, ModelPort, AI Movie Director, Hivemind, Receptionist OS, Freight Order Agent, Brightpath, NEON RUN and Hollow Hull.",
     image: "/media/story-build.jpg",
   },
 ];

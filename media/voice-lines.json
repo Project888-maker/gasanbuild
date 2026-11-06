@@ -1,12 +1,66 @@
 [
-  {"id": "greeting", "text": "Hi, I'm Jasmin, Gasan's AI Chief of Staff. I know every project he has built, how it works, and why it matters. Ask me anything, take my guided tour, or request a live video interview with me."},
-  {"id": "tour-01", "text": "Hi, I'm Jasmin, Gasan's AI Chief of Staff. Let me walk you through what he has built this year. You can pause or skip at any time."},
-  {"id": "tour-02", "text": "I'll start with the project I know best, because I'm part of it. This is Hermes, Gasan's autonomous operator agent."},
-  {"id": "tour-03", "text": "She works through Telegram, phone calls and live video, with more than sixty tools: email, calendar, websites, media, and his businesses."},
-  {"id": "tour-04", "text": "The part employers ask about most: when she lacks a skill, she builds it, tests it with real assertions, and deploys it herself, with automatic rollback."},
-  {"id": "tour-05", "text": "Next, Dentalscaner: a free marketplace where UK patients compare Turkish dental clinics and chat with them directly, translated both ways."},
-  {"id": "tour-06", "text": "ModelPort is one API for more than fifty AI models, plus an IDE with a live voice agent that operates the computer: the browser, apps, and the real mouse pointer."},
-  {"id": "tour-07", "text": "Freight Order Agent turns an order email and PDF into a routed, risk-checked job, so one dispatcher can run twice as many trucks. A human approves every send."},
-  {"id": "tour-08", "text": "And he builds games too. Neon Run is a cyberpunk driving game that runs in your browser. Every asset in it was made with AI. You can play it."},
-  {"id": "tour-09", "text": "That's the highlights. All ten projects are here. If you'd like to talk to me live on video, request an interview, and Gasan will review it personally."}
+  {
+    "id": "greeting",
+    "text": "Hi, I'm Jasmin, Gasan's AI Chief of Staff. I know every project he has built, how it works, and why it matters. Ask me anything, take my guided tour, or request a live video interview with me."
+  },
+  {
+    "id": "tour-01",
+    "text": "Hi, I'm Jasmin, Gasan's AI Chief of Staff. Let me walk you through what he has built this year. You can pause or skip at any time."
+  },
+  {
+    "id": "tour-02",
+    "text": "I'll start with the project I know best, because I'm part of it. This is Hermes, Gasan's autonomous operator agent."
+  },
+  {
+    "id": "tour-03",
+    "text": "She works through Telegram, phone calls and live video, with more than sixty tools: email, calendar, websites, media, and his businesses."
+  },
+  {
+    "id": "tour-04",
+    "text": "The part employers ask about most: when she lacks a skill, she builds it, tests it with real assertions, and deploys it herself, with automatic rollback."
+  },
+  {
+    "id": "tour-05",
+    "text": "Next, Dentalscaner: a free marketplace where UK patients compare Turkish dental clinics and chat with them directly, translated both ways."
+  },
+  {
+    "id": "tour-06",
+    "text": "ModelPort is one API for more than fifty AI models, plus an IDE with a live voice agent that operates the computer: the browser, apps, and the real mouse pointer."
+  },
+  {
+    "id": "tour-07",
+    "text": "Freight Order Agent turns an order email and PDF into a routed, risk-checked job, so one dispatcher can run twice as many trucks. A human approves every send."
+  },
+  {
+    "id": "tour-08",
+    "text": "And he builds games too. Neon Run is a cyberpunk driving game that runs in your browser. Every asset in it was made with AI. You can play it."
+  },
+  {
+    "id": "tour-09",
+    "text": "That's the highlights. All ten projects are here. If you'd like to talk to me live on video, request an interview, and Gasan will review it personally."
+  },
+  {
+    "id": "tour-10",
+    "text": "AI Movie Director lets anyone direct a live AI film in the browser. It streams in real time, the story changes as you speak, and every second is metered and billed."
+  },
+  {
+    "id": "tour-11",
+    "text": "Hivemind puts a room of AI experts on your decision. They debate it in rounds, check evidence from the live web, and hand you an analyst-grade report."
+  },
+  {
+    "id": "tour-12",
+    "text": "Receptionist OS gives any business its own AI phone receptionist, built from its website, with safety rules no caller can talk it out of."
+  },
+  {
+    "id": "tour-13",
+    "text": "Brightpath is a calm homeschool workspace. The curriculum is real and kept in the database, and the AI is a tutor that only teaches from reviewed material."
+  },
+  {
+    "id": "tour-14",
+    "text": "Hollow Hull goes further: a survival-horror level in Unreal Engine 5, built entirely from scripts, with AI-made textures and props. Nothing was placed by hand."
+  },
+  {
+    "id": "tour-15",
+    "text": "That's all ten. If you'd like to talk to me live on video, or to Gasan himself, just ask me in the chat, and Gasan will review it personally."
+  }
 ]
