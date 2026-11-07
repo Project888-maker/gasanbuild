@@ -41,14 +41,13 @@ export async function POST(request: Request) {
 
   // One record per interview; a reconnect adds to it.
   const replies = added.filter((t) => t.role === "assistant").length;
-  const [saved] = await db`
+  await db`
     insert into chat_conversations (id, visitor, page, messages, turns)
     values (${id}, 'live-interview', '/interview', ${JSON.stringify(added)}::jsonb, ${replies})
     on conflict (id) do update set
       messages = chat_conversations.messages || excluded.messages,
       turns = chat_conversations.turns + excluded.turns,
-      updated_at = now()
-    returning messages`;
+      updated_at = now()`;
 
   after(async () => {
     let r: Review | null = null;
@@ -58,7 +57,9 @@ export async function POST(request: Request) {
         name: String(guest.name), company: String(guest.company || ""), role: String(guest.role || ""),
         topics: String(guest.topics || ""), minutes: Number(guest.minutes) || 20,
       });
-      r = (await review(saved.messages as Turn[], { prompt, guest: `${guest.name}${who ? `, ${who}` : ""}` })).review;
+      // This call only: every call on one invite is saved in one record, and reviewing the
+      // whole record read each new call's greeting as Jasmin "re-greeting" mid-call.
+      r = (await review(added, { prompt, guest: `${guest.name}${who ? `, ${who}` : ""}` })).review;
       await db`update chat_conversations set review = ${JSON.stringify(r)}::jsonb, reviewed_at = now() where id = ${id}`;
     } catch (e) {
       console.error("interview review", e);
