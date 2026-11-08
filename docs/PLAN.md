@@ -227,3 +227,20 @@ cost (voice + avatar) is measured on the first test call and the caps are set fr
    what she must not discuss.
 6. Network access for this environment to your live sites when we start recording demos
    (an approval prompt will ask).
+
+## Sputnik Delivery Ltd: driver recruiting (2026-11-08)
+
+A separate business sharing this site; the portfolio's nav, footer and Jasmin are hidden on
+`/sputnik*` (`SiteChrome`). Nothing posts to Facebook automatically: Gasan posts by hand.
+
+- `/sputnik`: public "Drive with Sputnik" sign-up page. Each ad links with `?src=g<group>-a<ad>`,
+  so every application shows which group and which ad it came from. Applications go to Neon
+  (`driver_applications`) and to Gasan's Telegram with a WhatsApp button.
+- `/sputnik/admin`: private posting planner (signed link, 90 days; "send me a fresh link"
+  sends it to his Telegram). Today: up to 10 due groups, rotated ads with the tracking link,
+  Copy → Open group → "I posted it", 4-minute spacing, same group at most every 7 days.
+  Groups (Facebook search shortcuts, rules, notes), Ads (4 starters), Drivers (status, notes,
+  delete on request).
+- To fill in: `web/src/content/sputnik.ts` (group link, WhatsApp number, areas, pay/offer).
+- Hermes keeps posting to Sputnik's own group through Publer.
+- Next: Meta lead ads pointing at `/sputnik?src=meta`.

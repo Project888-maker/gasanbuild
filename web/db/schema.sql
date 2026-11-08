@@ -60,3 +60,48 @@ create table if not exists job_runs (
   result jsonb,
   primary key (name, day)
 );
+
+-- 2026-11-08: Sputnik Delivery Ltd driver sign-ups and the group posting planner.
+-- The app also creates these on first use (web/src/lib/sputnik.ts).
+create table if not exists sputnik_groups (
+  id serial primary key,
+  created_at timestamptz not null default now(),
+  name text not null,
+  url text not null default '',
+  area text not null default '',
+  members integer,
+  status text not null default 'to_join' check (status in ('to_join', 'requested', 'joined', 'left')),
+  ads text not null default 'yes' check (ads in ('yes', 'ask', 'no')),
+  every_days integer not null default 7,
+  notes text not null default ''
+);
+create table if not exists sputnik_ads (
+  id serial primary key,
+  created_at timestamptz not null default now(),
+  title text not null,
+  body text not null,
+  active boolean not null default true
+);
+create table if not exists sputnik_posts (
+  id serial primary key,
+  posted_at timestamptz not null default now(),
+  group_id integer not null references sputnik_groups(id) on delete cascade,
+  ad_id integer references sputnik_ads(id) on delete set null
+);
+create table if not exists driver_applications (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null,
+  phone text not null,
+  email text not null default '',
+  area text not null default '',
+  vehicle text not null default '',
+  licence text not null default '',
+  experience text not null default '',
+  start text not null default '',
+  source text not null default '',
+  visitor text not null,
+  status text not null default 'new' check (status in ('new', 'contacted', 'onboarded', 'rejected')),
+  note text not null default ''
+);
+create index if not exists driver_applications_visitor on driver_applications (visitor, created_at);
