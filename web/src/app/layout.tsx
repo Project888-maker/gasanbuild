@@ -5,7 +5,6 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import JasminDock from "@/components/JasminDock";
 import LiveInterview from "@/components/LiveInterview";
-import SiteChrome from "@/components/SiteChrome";
 import "./globals.css";
 
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif" });
@@ -39,13 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="grain">
         <Motion />
-        <SiteChrome><Nav /></SiteChrome>
+        <Nav />
         {children}
-        <SiteChrome>
-          <Footer />
-          <JasminDock />
-          <LiveInterview />
-        </SiteChrome>
+        <Footer />
+        <JasminDock />
+        <LiveInterview />
       </body>
     </html>
   );
