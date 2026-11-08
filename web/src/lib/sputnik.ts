@@ -9,12 +9,17 @@ const base = () => (process.env.NEXT_PUBLIC_SITE_URL || "https://gasanbuildsai.v
 
 export const ADMIN_DAYS = 90;
 
+/** Sputnik's own domain once it points here (SPUTNIK_SITE_URL), otherwise the pages under /sputnik. */
+const own = () => (process.env.SPUTNIK_SITE_URL || "").replace(/\/$/, "");
+export const signupBase = () => (own() ? `${own()}/` : `${base()}/sputnik`);
+const adminBase = () => (own() ? `${own()}/admin` : `${base()}/sputnik/admin`);
+
 /** Gasan's private link to the planner (valid 90 days), sent to his Telegram. */
 export function plannerUrl(days = ADMIN_DAYS): string | null {
   if (!secret()) return null;
   const expires = Date.now() + days * 86_400_000;
   const sig = createHmac("sha256", secret()).update(`sputnik|${expires}`).digest("base64url");
-  return `${base()}/sputnik/admin?e=${expires}&k=${sig}`;
+  return `${adminBase()}?e=${expires}&k=${sig}`;
 }
 
 export function verifyPlanner(expires: unknown, key: unknown): boolean {
@@ -72,6 +77,7 @@ export function ensureTables(): Promise<void> {
       note text not null default ''
     )`;
     await db`create index if not exists driver_applications_visitor on driver_applications (visitor, created_at)`;
+    await db`alter table driver_applications add column if not exists years text not null default '', add column if not exists insurance text not null default ''`;
   })().catch((e) => {
     ready = null;
     throw e;

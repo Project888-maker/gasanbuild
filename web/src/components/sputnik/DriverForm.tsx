@@ -36,12 +36,11 @@ export default function DriverForm({ source, groupUrl, whatsapp }: { source: str
       <div className="mt-6 rounded-2xl bg-[#ff8a2a]/10 p-5">
         <p className="text-xl font-extrabold">Thanks, we&apos;ve got it. 🚐</p>
         <p className="mt-2 text-sm leading-relaxed text-[#c7d0dd]">
-          We&apos;ll call or WhatsApp you within two working days. Meanwhile, join the drivers in our Facebook group for routes,
-          updates and news.
+          We&apos;ll call or WhatsApp you within two working days. Meanwhile, join us on Facebook for routes, updates and news.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <a href={groupUrl} target="_blank" rel="noopener" className="rounded-full bg-[#ff8a2a] px-5 py-3 font-bold text-[#0b1220]">
-            Join the Facebook group
+            Join us on Facebook
           </a>
           {whatsapp && (
             <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener" className="rounded-full border border-white/20 px-5 py-3 font-semibold">
@@ -68,7 +67,7 @@ export default function DriverForm({ source, groupUrl, whatsapp }: { source: str
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className={label} htmlFor="area">Where do you live?</label>
-          <input id="area" name="area" maxLength={120} placeholder="Town or postcode, e.g. Ilford, IG1" className={field} />
+          <input id="area" name="area" maxLength={120} placeholder="Area or postcode, e.g. Kilburn, NW6" className={field} />
         </div>
         <div>
           <label className={label} htmlFor="email">Email (optional)</label>
@@ -77,22 +76,40 @@ export default function DriverForm({ source, groupUrl, whatsapp }: { source: str
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className={label} htmlFor="vehicle">Vehicle</label>
-          <select id="vehicle" name="vehicle" className={field} defaultValue="">
+          <label className={label} htmlFor="vehicle">Do you have your own van?</label>
+          <select id="vehicle" name="vehicle" required className={field} defaultValue="">
             <option value="" disabled>Choose one</option>
-            <option>I have my own van</option>
-            <option>I need a van</option>
-            <option>I have a car</option>
+            <option>Yes, my own van</option>
+            <option>No van</option>
           </select>
         </div>
         <div>
-          <label className={label} htmlFor="licence">Full UK licence held for</label>
-          <select id="licence" name="licence" className={field} defaultValue="">
+          <label className={label} htmlFor="years">Multi-drop experience</label>
+          <select id="years" name="years" required className={field} defaultValue="">
             <option value="" disabled>Choose one</option>
-            <option>Under 1 year</option>
-            <option>1 to 2 years</option>
-            <option>3 years or more</option>
-            <option>No UK licence yet</option>
+            <option>Under 2 years</option>
+            <option>2 to 3 years</option>
+            <option>3 to 5 years</option>
+            <option>5 years or more</option>
+          </select>
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className={label} htmlFor="insurance">Van insurance and Goods in Transit</label>
+          <select id="insurance" name="insurance" required className={field} defaultValue="">
+            <option value="" disabled>Choose one</option>
+            <option>I have both</option>
+            <option>Van insurance only</option>
+            <option>Not yet</option>
+          </select>
+        </div>
+        <div>
+          <label className={label} htmlFor="licence">Full UK driving licence</label>
+          <select id="licence" name="licence" required className={field} defaultValue="">
+            <option value="" disabled>Choose one</option>
+            <option>Yes</option>
+            <option>No</option>
           </select>
         </div>
       </div>
@@ -108,8 +125,8 @@ export default function DriverForm({ source, groupUrl, whatsapp }: { source: str
           </select>
         </div>
         <div>
-          <label className={label} htmlFor="experience">Delivery experience</label>
-          <input id="experience" name="experience" maxLength={600} placeholder="e.g. 1 year Amazon, DPD" className={field} />
+          <label className={label} htmlFor="experience">Which companies have you driven for?</label>
+          <input id="experience" name="experience" maxLength={600} placeholder="e.g. 3 years DPD, 1 year Amazon" className={field} />
         </div>
       </div>
       {/* Hidden from people; bots fill it in. */}

@@ -7,12 +7,12 @@ import { SPUTNIK } from "@/content/sputnik";
 
 export const metadata: Metadata = {
   title: { absolute: "Drivers wanted · Sputnik Delivery Ltd" },
-  description: "Multi-drop delivery drivers wanted in London and the South East. Weekly pay, steady routes. Apply in one minute.",
+  description: "Experienced multi-drop driver wanted for fixed routes in NW1 & W2, Central London. £1 per parcel, 150 to 200 a day, 6 days a week. Apply in one minute.",
   openGraph: {
     type: "website",
     siteName: SPUTNIK.company,
-    title: "Delivery drivers wanted · Sputnik Delivery Ltd",
-    description: "Weekly pay, steady routes, with or without your own van. Apply in one minute.",
+    title: "Multi-drop driver wanted: NW1 & W2 · Sputnik Delivery Ltd",
+    description: "£1 per parcel, 150 to 200 a day, 6 days a week, fixed routes. Own van needed. Apply in one minute.",
     images: [{ url: "/sputnik/og.jpg", width: 1200, height: 630, alt: "A delivery van on a London street" }],
   },
   twitter: { card: "summary_large_image", images: ["/sputnik/og.jpg"] },
@@ -45,7 +45,7 @@ export default async function Sputnik({ searchParams }: { searchParams: Promise<
               Apply in 1 minute
             </a>
             <a href={SPUTNIK.groupUrl} target="_blank" rel="noopener" className="rounded-full border border-white/20 px-6 py-3.5 font-semibold">
-              Join our Facebook group
+              Join us on Facebook
             </a>
           </div>
         </section>
@@ -75,7 +75,7 @@ export default async function Sputnik({ searchParams }: { searchParams: Promise<
       <section id="apply" className="mx-auto max-w-2xl scroll-mt-6 px-4 pb-20 pt-14 sm:px-8">
         <div className="rounded-3xl border border-white/10 bg-[#111a2c] p-5 sm:p-8">
           <h2 className="text-3xl font-extrabold tracking-tight">Apply now</h2>
-          <p className="mt-2 text-sm text-[#aab4c3]">One minute. We call or WhatsApp you within two working days.</p>
+          <p className="mt-2 text-sm text-[#aab4c3]">One minute. Experienced drivers with their own van only. We call or WhatsApp you within two working days.</p>
           <DriverForm source={source} groupUrl={SPUTNIK.groupUrl} whatsapp={SPUTNIK.whatsapp} />
         </div>
       </section>

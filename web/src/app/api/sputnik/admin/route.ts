@@ -40,7 +40,7 @@ export async function POST(request: Request) {
            from sputnik_ads a order by a.id`,
         db`select p.id, p.posted_at, p.group_id, p.ad_id from sputnik_posts p
            where p.posted_at > now() - interval '60 days' order by p.posted_at desc`,
-        db`select id, created_at, name, phone, email, area, vehicle, licence, experience, start, source, status, note
+        db`select id, created_at, name, phone, email, area, vehicle, licence, years, insurance, experience, start, source, status, note
            from driver_applications order by created_at desc limit 500`,
       ]);
       return Response.json({ groups, ads, posts, applicants });

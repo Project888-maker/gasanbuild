@@ -3,7 +3,7 @@
 import type { Metadata } from "next";
 import Planner from "@/components/sputnik/Planner";
 import LinkRequest from "@/components/sputnik/LinkRequest";
-import { verifyPlanner } from "@/lib/sputnik";
+import { signupBase, verifyPlanner } from "@/lib/sputnik";
 import { POSTING, GROUP_SEARCHES } from "@/content/sputnik";
 
 export const dynamic = "force-dynamic";
@@ -24,5 +24,5 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       </main>
     );
   }
-  return <Planner e={e!} k={k!} rules={POSTING} searches={GROUP_SEARCHES} site={(process.env.NEXT_PUBLIC_SITE_URL || "https://gasanbuildsai.vercel.app").replace(/\/$/, "")} />;
+  return <Planner e={e!} k={k!} rules={POSTING} searches={GROUP_SEARCHES} signup={signupBase()} />;
 }

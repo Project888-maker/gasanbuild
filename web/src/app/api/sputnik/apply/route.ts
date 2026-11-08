@@ -6,7 +6,7 @@ import { ensureTables, plannerUrl } from "@/lib/sputnik";
 
 export const runtime = "nodejs";
 
-const LIMITS = { name: 120, phone: 40, email: 200, area: 120, vehicle: 60, licence: 60, experience: 600, start: 80, source: 60 } as const;
+const LIMITS = { name: 120, phone: 40, email: 200, area: 120, vehicle: 60, licence: 60, years: 40, insurance: 60, experience: 600, start: 80, source: 60 } as const;
 type Field = keyof typeof LIMITS;
 
 const text = (value: unknown, max: number) => (typeof value === "string" ? value.trim().slice(0, max) : "");
@@ -40,8 +40,8 @@ export async function POST(request: Request) {
   if (Number(count) >= 3) return Response.json({ message: "We already have your application. We'll call you soon." }, { status: 429 });
 
   await db`
-    insert into driver_applications (name, phone, email, area, vehicle, licence, experience, start, source, visitor)
-    values (${a.name}, ${a.phone}, ${a.email}, ${a.area}, ${a.vehicle}, ${a.licence}, ${a.experience}, ${a.start}, ${a.source}, ${visitor})`;
+    insert into driver_applications (name, phone, email, area, vehicle, licence, years, insurance, experience, start, source, visitor)
+    values (${a.name}, ${a.phone}, ${a.email}, ${a.area}, ${a.vehicle}, ${a.licence}, ${a.years}, ${a.insurance}, ${a.experience}, ${a.start}, ${a.source}, ${visitor})`;
 
   let from = a.source ? `link ${a.source}` : "direct";
   const m = a.source.match(/^g(\d+)(?:-a(\d+))?$/);
@@ -54,10 +54,13 @@ export async function POST(request: Request) {
   const lines = [
     "🚐 New Sputnik driver application",
     `${a.name} · ${a.phone}${a.email ? ` · ${a.email}` : ""}`,
-    [a.area && `Area: ${a.area}`, a.vehicle && `Vehicle: ${a.vehicle}`, a.licence && `Licence: ${a.licence}`, a.start && `Start: ${a.start}`]
+    [a.years && `Experience: ${a.years}`, a.vehicle && `Van: ${a.vehicle}`, a.insurance && `Insurance: ${a.insurance}`, a.licence && `UK licence: ${a.licence}`]
       .filter(Boolean)
       .join(" · "),
-    a.experience ? `Experience: ${a.experience}` : "",
+    [a.area && `Lives: ${a.area}`, a.start && `Start: ${a.start}`]
+      .filter(Boolean)
+      .join(" · "),
+    a.experience ? `Drove for: ${a.experience}` : "",
     `Came from ${from}`,
   ].filter(Boolean);
   const wa = `https://wa.me/${digits.startsWith("0") ? `44${digits.slice(1)}` : digits}`;

@@ -14,7 +14,7 @@ type Group = {
 type Ad = { id: number; title: string; body: string; active: boolean; posts: number; applicants: number };
 type Post = { id: number; posted_at: string; group_id: number; ad_id: number | null };
 type Applicant = {
-  id: string; created_at: string; name: string; phone: string; email: string; area: string; vehicle: string; licence: string;
+  id: string; created_at: string; name: string; phone: string; email: string; area: string; vehicle: string; licence: string; years: string; insurance: string;
   experience: string; start: string; source: string; status: "new" | "contacted" | "onboarded" | "rejected"; note: string;
 };
 type State = { groups: Group[]; ads: Ad[]; posts: Post[]; applicants: Applicant[] };
@@ -38,7 +38,7 @@ const waLink = (phone: string) => {
   return `https://wa.me/${d.startsWith("0") ? `44${d.slice(1)}` : d}`;
 };
 
-export default function Planner({ e, k, rules, searches, site }: { e: string; k: string; rules: Rules; searches: readonly string[]; site: string }) {
+export default function Planner({ e, k, rules, searches, signup }: { e: string; k: string; rules: Rules; searches: readonly string[]; signup: string }) {
   const [state, setState] = useState<State | null>(null);
   const [tab, setTab] = useState<"today" | "groups" | "ads" | "drivers">("today");
   const [error, setError] = useState("");
@@ -95,7 +95,7 @@ export default function Planner({ e, k, rules, searches, site }: { e: string; k:
         ))}
       </nav>
       {error && <p className="mb-4 rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>}
-      {tab === "today" && <Today state={state} rules={rules} site={site} now={now} act={act} />}
+      {tab === "today" && <Today state={state} rules={rules} signup={signup} now={now} act={act} />}
       {tab === "groups" && <Groups state={state} rules={rules} searches={searches} act={act} />}
       {tab === "ads" && <Ads state={state} act={act} />}
       {tab === "drivers" && <Drivers state={state} act={act} />}
@@ -120,7 +120,7 @@ type Act = (action: string, extra?: Record<string, unknown>) => Promise<void>;
 
 /* ---------------- Today ---------------- */
 
-function Today({ state, rules, site, now, act }: { state: State; rules: Rules; site: string; now: number; act: Act }) {
+function Today({ state, rules, signup, now, act }: { state: State; rules: Rules; signup: string; now: number; act: Act }) {
   const [swap, setSwap] = useState<Record<number, number>>({});
   const [copied, setCopied] = useState<number | null>(null);
   const active = state.ads.filter((a) => a.active);
@@ -145,7 +145,7 @@ function Today({ state, rules, site, now, act }: { state: State; rules: Rules; s
     if (!pool.length) return undefined;
     return pool[(swap[g.id] || 0) % pool.length];
   };
-  const textFor = (g: Group, ad: Ad) => ad.body.replaceAll("{link}", `${site}/sputnik?src=g${g.id}-a${ad.id}`);
+  const textFor = (g: Group, ad: Ad) => ad.body.replaceAll("{link}", `${signup}?src=g${g.id}-a${ad.id}`);
 
   const copy = async (g: Group, ad: Ad) => {
     await navigator.clipboard.writeText(textFor(g, ad)).catch(() => {});
@@ -395,9 +395,9 @@ function Drivers({ state, act }: { state: State; act: Act }) {
             <p className="text-xs text-[#7f8a9b]">{new Date(a.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · from {groupName(a.source)}</p>
           </div>
           <p className="mt-1 text-sm text-[#aab4c3]">
-            {[a.area, a.vehicle, a.licence && `licence ${a.licence}`, a.start].filter(Boolean).join(" · ")}
+            {[a.years && `${a.years} multi-drop`, a.vehicle, a.insurance && `insurance: ${a.insurance}`, a.licence && `UK licence: ${a.licence}`, a.area, a.start].filter(Boolean).join(" · ")}
           </p>
-          {a.experience && <p className="mt-1 text-sm text-[#aab4c3]">Experience: {a.experience}</p>}
+          {a.experience && <p className="mt-1 text-sm text-[#aab4c3]">Drove for: {a.experience}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             <a className={primary} href={waLink(a.phone)} target="_blank" rel="noopener">WhatsApp</a>
             <a className={ghost} href={`tel:${a.phone.replace(/[^\d+]/g, "")}`}>Call {a.phone}</a>

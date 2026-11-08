@@ -1,29 +1,30 @@
 // Sputnik Delivery Ltd: the driver sign-up page and the group posting planner.
-// Everything Gasan may want to change lives here. Lines marked TODO need his real details.
+// Everything Gasan may want to change lives here. The offer matches Jasmin's daily 'drivers' post.
 
 export const SPUTNIK = {
   company: "Sputnik Delivery Ltd",
-  // TODO(Gasan): the link to the Sputnik Delivery Ltd Facebook group.
-  groupUrl: "https://www.facebook.com/groups/",
-  // TODO(Gasan): WhatsApp number in international format without "+" or spaces, e.g. 447700900123.
-  whatsapp: "",
-  // TODO(Gasan): the areas you hire in.
-  areas: ["London", "Essex", "Kent", "Hertfordshire"],
-  headline: "Drive with Sputnik.",
+  // Sputnik Delivery Ltd on Facebook.
+  groupUrl: "https://www.facebook.com/profile.php?id=100063960219070",
+  // WhatsApp, international format without "+" or spaces (07907 888749).
+  whatsapp: "447907888749",
+  areas: ["NW1", "W2", "Central London"],
+  headline: "Same patch. Every day.",
   intro:
-    "Multi-drop parcel delivery across London and the South East. Steady routes, weekly pay and a team that picks up the phone.",
-  // TODO(Gasan): check every line is true for Sputnik before going live.
+    "Regular multi-drop routes in NW1 and W2, Central London. 150 to 200 parcels a day at £1 each, six days a week. The route doesn't move: learn it once, run it well, and it keeps paying.",
   offer: [
-    { title: "Weekly pay", text: "Paid every week, on time, with a clear breakdown of every route." },
-    { title: "Steady routes", text: "Regular multi-drop routes, full time or part time." },
-    { title: "Van or no van", text: "Bring your own van, or ask about renting one through us." },
-    { title: "Real support", text: "A London depot team you can call, not a chatbot." },
+    { title: "£1 per parcel", text: "150 to 200 parcels a day for the right driver." },
+    { title: "Fixed routes", text: "NW1 and W2, Central London. Same streets, week after week." },
+    { title: "Six days a week", text: "Consistent, local, ongoing work. No thin days without explanation." },
+    { title: "No depot politics", text: "No being shuffled around to cover gaps that aren't yours to fill." },
   ],
   requirements: [
+    "2 to 3+ years of multi-drop experience (DPD, Amazon, Yodel, DHL or similar)",
+    "Your own van",
+    "Van insurance",
+    "Goods in Transit (GIT) insurance",
     "Full UK driving licence",
     "Right to work in the UK",
-    "Smartphone for the delivery app",
-    "Self-employed or happy to register",
+    "Proof of address",
   ],
 } as const;
 
@@ -42,6 +43,7 @@ export const GROUP_SEARCHES = [
   "delivery driver jobs London",
   "parcel delivery drivers UK",
   "Amazon Flex drivers London",
+  "Central London courier drivers",
   "DPD Evri Yodel drivers",
   "owner driver courier UK",
   "van drivers Essex",
@@ -54,18 +56,18 @@ export const searchUrl = (q: string) => `https://www.facebook.com/search/groups/
 export const STARTER_ADS = [
   {
     title: "Short and direct",
-    body: "🚐 Multi-drop drivers wanted: London & South East\n\nSputnik Delivery Ltd is hiring self-employed drivers.\n✅ Weekly pay\n✅ Steady routes, full or part time\n✅ Own van, or ask about renting one\n\nApply in 1 minute 👉 {link}",
+    body: "🚐 Experienced multi-drop driver wanted: NW1 & W2, Central London\n\n💷 £1 per parcel\n📦 150 to 200 parcels a day\n📅 6 days a week, fixed routes\n\nOwn van, van insurance and GIT needed. 2 to 3+ years with DPD, Amazon, Yodel, DHL or similar.\n\nApply in 1 minute 👉 {link}",
   },
   {
-    title: "Question opener",
-    body: "Tired of routes that change every day and pay that comes late? 🤔\n\nWe're Sputnik Delivery Ltd, a London parcel delivery company, and we're taking on drivers now. Weekly pay, regular routes and a depot team that actually answers.\n\nTakes a minute to apply: {link}",
+    title: "Same patch",
+    body: "Tired of different postcodes every week and rates that change without warning? 🤔\n\nSputnik Delivery Ltd has a fixed route in NW1 & W2, Central London. 150 to 200 parcels a day at £1 each, six days a week. Learn it once, run it well.\n\nExperienced drivers with their own van only. Apply here: {link}",
   },
   {
-    title: "No van? No problem",
-    body: "📦 Want to drive but don't have a van?\n\nSputnik Delivery Ltd has work for drivers with or without their own van. Full UK licence and right to work needed.\n\nDetails and sign-up here 👉 {link}",
+    title: "One position open",
+    body: "📦 One position open: Central London (NW1 & W2)\n\nRegular multi-drop route, £1 per parcel, 150 to 200 a day, 6 days a week.\n\nYou'll need: own van, van insurance, Goods in Transit cover, UK licence, right to work and 2 to 3+ years of multi-drop experience.\n\nDetails and sign-up 👉 {link}",
   },
   {
     title: "Community angle",
-    body: "Hi all 👋 Gasan here from Sputnik Delivery Ltd.\n\nWe're growing and looking for reliable multi-drop drivers in London, Essex, Kent and Herts. If that's you, or someone you know, here's where to apply: {link}\n\nHappy to answer questions in the comments.",
+    body: "Hi all 👋 Gasan here from Sputnik Delivery Ltd.\n\nWe're looking for an experienced multi-drop driver with their own van for a regular route in NW1 & W2, Central London. £1 per parcel, 150 to 200 a day, six days a week.\n\nIf that's you, or someone you know, apply here: {link}\n\nHappy to answer questions in the comments.",
   },
 ];

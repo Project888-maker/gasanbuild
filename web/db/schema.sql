@@ -105,3 +105,6 @@ create table if not exists driver_applications (
   note text not null default ''
 );
 create index if not exists driver_applications_visitor on driver_applications (visitor, created_at);
+alter table driver_applications
+  add column if not exists years text not null default '',
+  add column if not exists insurance text not null default '';
