@@ -25,7 +25,7 @@ export default async function Sputnik({ searchParams }: { searchParams: Promise<
     <main className="min-h-screen bg-[#0b1220] text-[#eef2f7]">
       <div className="relative overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-[position:45%_center] opacity-50"
+          className="absolute inset-0 bg-cover bg-[position:35%_center] opacity-50"
           style={{ backgroundImage: "url(/sputnik/hero.jpg)" }}
           aria-hidden
         />
