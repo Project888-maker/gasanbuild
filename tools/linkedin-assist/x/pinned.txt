@@ -1,0 +1,8 @@
+I build AI that does the work.
+
+Last year I paid developers 7 months to build one platform. Then I learned to build it myself.
+
+10 AI products since: agents, voice AI, a marketplace, games.
+
+Walk through all ten, or interview my AI Chief of Staff:
+gasanbuildsai.vercel.app
