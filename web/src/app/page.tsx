@@ -48,7 +48,7 @@ export default function Home() {
             <span className="block animate-[fadeUp_1.4s_var(--ease-film)_0.5s_both] italic text-gold">that does the work.</span>
           </h1>
           <p className="mt-8 max-w-xl animate-[fadeUp_1.4s_var(--ease-film)_0.7s_both] text-lg leading-relaxed text-white/80">
-            Autonomous agents, real-time voice and video, platforms and games. Ten products, designed and shipped
+            Autonomous agents, real-time voice and video, platforms and games. Eleven products, designed and shipped
             end to end. Presented by Jasmin, my AI Chief of Staff.
           </p>
           <div className="mt-10 flex animate-[fadeUp_1.4s_var(--ease-film)_0.85s_both] flex-wrap gap-3">
@@ -107,7 +107,7 @@ export default function Home() {
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
             <p data-reveal className="eyebrow">Selected work · 2026</p>
-            <h2 data-reveal className="display mt-4 text-5xl sm:text-7xl">Ten projects. <span className="italic text-muted">One builder.</span></h2>
+            <h2 data-reveal className="display mt-4 text-5xl sm:text-7xl">Eleven projects. <span className="italic text-muted">One builder.</span></h2>
           </div>
           <Link data-reveal href="/work" className="btn btn-ghost">All projects →</Link>
         </div>

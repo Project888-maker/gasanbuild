@@ -3,7 +3,7 @@ import ProjectCard from "@/components/ProjectCard";
 import JasminButton from "@/components/JasminButton";
 import { GROUPS, projects, type Project } from "@/content/projects";
 
-export const metadata: Metadata = { title: "Work", description: "Ten AI products built and shipped by Gasan." };
+export const metadata: Metadata = { title: "Work", description: "Eleven AI products built and shipped by Gasan." };
 
 export default function Work() {
   const groups = Object.entries(GROUPS) as [Project["group"], string][];
@@ -11,7 +11,7 @@ export default function Work() {
     <main className="mx-auto max-w-7xl px-4 pb-28 pt-36 sm:px-8">
       <p data-reveal className="eyebrow">The work · 2026</p>
       <h1 data-reveal className="display mt-5 max-w-5xl text-6xl sm:text-8xl">
-        Ten products, <span className="italic text-gold">each one shipped.</span>
+        Eleven products, <span className="italic text-gold">each one shipped.</span>
       </h1>
       <p data-reveal className="mt-6 max-w-2xl leading-relaxed text-white/75">
         Every chapter shows the problem, how it works, the hard parts I solved and its real status. Want the short version?

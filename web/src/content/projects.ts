@@ -350,6 +350,41 @@ export const projects: Project[] = [
     links: [{ label: "homeschoolsystem.vercel.app", href: "https://homeschoolsystem.vercel.app" }],
   },
   {
+    slug: "bloodai",
+    title: "BloodAI",
+    kicker: "AI blood-test explainer",
+    tagline: "Upload a lab report and see every number explained in plain language, then talk it through by voice.",
+    problem:
+      "Blood results arrive as a page of numbers and flags. Most people can't tell what matters, and a GP appointment is ten minutes.",
+    summary:
+      "BloodAI reads a lab report from a PDF or a photo, checks every value with a deterministic rules engine, compares the results with thousands of adults of the same age and sex using models trained on US national health survey data (NHANES), and has Claude explain it all in plain English, Russian or German. A voice assistant talks you through it. It prepares questions for your GP; it never diagnoses.",
+    group: "agents",
+    status: "private",
+    statusNote: "Live and password-protected because it handles health data, so it is shown here by demo.",
+    accent: "#E5484D",
+    poster: "/media/bloodai.jpg",
+    steps: [
+      { title: "Read", text: "Claude reads the lab report from a PDF or a photo, with units converted to UK standards." },
+      { title: "Check", text: "A deterministic rules engine flags out-of-range values, red flags and patterns, and calculates scores such as kidney function (eGFR), FIB-4 and HOMA-IR. No AI in this step." },
+      { title: "Compare", text: "XGBoost models trained on about 17,000 NHANES adults compare you with people of your age and sex, and hormones get population percentiles." },
+      { title: "Explain", text: "Claude explains every number in plain language and answers follow-up questions, in English, Russian or German." },
+      { title: "Talk", text: "A real-time voice assistant on LiveKit talks you through the results and highlights each one on screen as it speaks." },
+    ],
+    stats: [
+      { value: "~17k", label: "adults in the training data" },
+      { value: "60", label: "tests explained in the Guide" },
+      { value: "3", label: "languages, text and voice" },
+      { value: "0", label: "diagnoses: questions for your GP" },
+    ],
+    hardProblems: [
+      { title: "Honest models", text: "Each condition model is measured against an age-and-sex-only baseline, and its result is hidden when the blood test doesn't add real signal." },
+      { title: "Light enough for serverless", text: "A pure-Python reader runs the XGBoost models, matching the original library to six decimal places, so the API needs no numpy or xgboost." },
+      { title: "Safety first", text: "Rules, not AI, decide the flags. Red flags always point to NHS 111 or a doctor today, and the app never advises on medication." },
+    ],
+    stack: ["Next.js 16", "TypeScript", "Python", "XGBoost", "NHANES data", "Claude API", "LiveKit Agents", "OpenAI GPT-Live voice", "Vercel", "GitHub Actions"],
+    links: [{ label: "bloodai-ten.vercel.app", href: "https://bloodai-ten.vercel.app" }],
+  },
+  {
     slug: "neonrun",
     title: "NEON RUN",
     kicker: "Browser game · three.js",
