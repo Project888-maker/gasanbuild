@@ -1,5 +1,5 @@
 // The guided tour: what Jasmin says and where the page goes while she says it.
-// It covers all ten projects, in the same order as the site.
+// It covers all eleven projects, in the same order as the site.
 // Each step's `id` names its recording in media/voice-lines.json (same words), its
 // voice file /media/voice/<id>.mp3 and its lip-synced clip /media/talk/<id>.mp4.
 // Media is cached for a year, so a changed line gets a new id, never a reused one.
@@ -66,6 +66,11 @@ const steps: Step[] = [
     actions: [{ type: "show_project", slug: "brightpath" }],
   },
   {
+    id: "tour-16",
+    say: "BloodAI explains a blood test in plain words. It reads the lab report, checks every value with fixed rules, compares you with thousands of people your age, and talks you through it by voice.",
+    actions: [{ type: "show_project", slug: "bloodai" }],
+  },
+  {
     id: "tour-08",
     say: "And he builds games too. NEON RUN is a cyberpunk driving game that runs in your browser. Every asset in it was made with AI. You can play it.",
     actions: [{ type: "show_project", slug: "neonrun" }],
@@ -76,8 +81,8 @@ const steps: Step[] = [
     actions: [{ type: "show_project", slug: "hollow-hull" }],
   },
   {
-    id: "tour-15",
-    say: "That's all ten. If you'd like to talk to me live on video, or to Gasan himself, just ask me in the chat, and Gasan will review it personally.",
+    id: "tour-17",
+    say: "That's all eleven. If you'd like to talk to me live on video, or to Gasan himself, just ask me in the chat, and Gasan will review it personally.",
     actions: [{ type: "back_to_overview" }],
   },
 ];
